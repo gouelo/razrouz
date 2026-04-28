@@ -533,6 +533,58 @@
 
     /* ── EMPTY STATE ── */
     .empty-basket { text-align: center; padding: 8px 0; font-size: 0.8rem; color: var(--text-muted); }
+
+    /* ── PERMANENT PROMPT ── */
+    .perm-prompt {
+      text-align: center;
+      padding: 8px 0 4px;
+    }
+    .perm-prompt .perm-icon { font-size: 2.8rem; margin-bottom: 10px; }
+    .perm-prompt .perm-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+    .perm-prompt .perm-sub   { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 22px; line-height: 1.5; }
+    .perm-btns { display: flex; gap: 10px; }
+    .btn-perm-yes {
+      flex: 1;
+      background: linear-gradient(135deg, #16a34a, #059669);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 15px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Rubik', sans-serif;
+      box-shadow: 0 4px 14px rgba(22,163,74,0.3);
+      transition: all 0.15s;
+    }
+    .btn-perm-yes:active { transform: scale(0.97); }
+    .btn-perm-no {
+      flex: 1;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 15px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: 'Rubik', sans-serif;
+      transition: all 0.15s;
+    }
+    .btn-perm-no:active { transform: scale(0.97); }
+
+    .custom-food-badge {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: #fbbf24;
+      color: white;
+      font-size: 0.55rem;
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 6px;
+      line-height: 1;
+    }
   </style>
 </head>
 <body>
@@ -615,31 +667,48 @@
 <div class="modal-overlay" id="manualModal" onclick="closeManualModal(event)">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-emoji">✏️</div>
-    <div class="modal-title">הוספה ידנית</div>
-    <div class="modal-subtitle">הכנס את פרטי המאכל</div>
-    <div class="manual-form">
-      <div class="form-group">
-        <label>שם המאכל</label>
-        <input class="form-input" id="manualName" type="text" placeholder="לדוגמה: שוקולד מריר" />
-      </div>
-      <div class="form-row">
+
+    <!-- Step 1: Form -->
+    <div id="manualStep1">
+      <div class="modal-emoji">✏️</div>
+      <div class="modal-title">הוספה ידנית</div>
+      <div class="modal-subtitle">הכנס את פרטי המאכל</div>
+      <div class="manual-form">
         <div class="form-group">
-          <label>קלוריות</label>
-          <input class="form-input" id="manualCal" type="number" placeholder="0" inputmode="numeric" />
+          <label>שם המאכל</label>
+          <input class="form-input" id="manualName" type="text" placeholder="לדוגמה: שוקולד מריר" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>קלוריות</label>
+            <input class="form-input" id="manualCal" type="number" placeholder="0" inputmode="numeric" />
+          </div>
+          <div class="form-group">
+            <label>חלבון (g)</label>
+            <input class="form-input" id="manualProt" type="number" placeholder="0" inputmode="numeric" />
+          </div>
         </div>
         <div class="form-group">
-          <label>חלבון (g)</label>
-          <input class="form-input" id="manualProt" type="number" placeholder="0" inputmode="numeric" />
+          <label>הערה (אופציונלי)</label>
+          <input class="form-input" id="manualNote" type="text" placeholder="כמות, הכנה..." />
         </div>
       </div>
-      <div class="form-group">
-        <label>הערה (אופציונלי)</label>
-        <input class="form-input" id="manualNote" type="text" placeholder="כמות, הכנה..." />
+      <button class="modal-confirm" onclick="confirmManual()">הוסף ✓</button>
+      <button class="modal-cancel" onclick="closeManualDirect()">ביטול</button>
+    </div>
+
+    <!-- Step 2: Permanent? -->
+    <div id="manualStep2" style="display:none;">
+      <div class="perm-prompt">
+        <div class="perm-icon">⭐</div>
+        <div class="perm-title">להוסיף כמוצר קבוע?</div>
+        <div class="perm-sub" id="permSubText"></div>
+      </div>
+      <div class="perm-btns">
+        <button class="btn-perm-yes" onclick="saveAsPermanent(true)">כן, שמור קבוע ✓</button>
+        <button class="btn-perm-no"  onclick="saveAsPermanent(false)">לא תודה</button>
       </div>
     </div>
-    <button class="modal-confirm" onclick="confirmManual()">הוסף ✓</button>
-    <button class="modal-cancel" onclick="closeManualDirect()">ביטול</button>
   </div>
 </div>
 
@@ -704,11 +773,13 @@ const CAL_GOAL  = 1700;
 const PROT_GOAL = 150;
 
 // ── STATE ──
-let log     = [];
-let history = [];
+let log        = [];
+let history    = [];
+let customFoods = [];   // permanently saved custom foods
 let pendingFood = null;
 let pendingQty  = null;
 let crackerCount = 1;
+let pendingManualItem = null;  // temp storage between step1 & step2
 
 // ── STORAGE ──
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -723,6 +794,16 @@ function loadState() {
   });
   const saved = localStorage.getItem('cal_log_' + TODAY);
   if (saved) log = JSON.parse(saved);
+}
+
+// ── CUSTOM FOODS ──
+function loadCustomFoods() {
+  const saved = localStorage.getItem('custom_foods');
+  if (saved) customFoods = JSON.parse(saved);
+}
+
+function saveCustomFoods() {
+  localStorage.setItem('custom_foods', JSON.stringify(customFoods));
 }
 
 // ── TOTALS ──
@@ -759,13 +840,15 @@ function updateUI() {
 function renderGrid() {
   const grid = document.getElementById('foodGrid');
   grid.innerHTML = '';
-  FOODS.forEach(food => {
+  const allFoods = [...FOODS, ...customFoods];
+  allFoods.forEach(food => {
     const div = document.createElement('div');
     div.className = 'food-card';
     div.id = 'fc_' + food.id;
     const displayCal  = food.type === 'weight' ? `${food.calPer100} קל/100g` : `${food.cal} קל`;
     const displayProt = food.type === 'weight' ? `${food.protPer100}g/100g`  : `${food.prot}g חלבון`;
     div.innerHTML = `
+      ${food.isCustom ? '<div class="custom-food-badge">שלי</div>' : ''}
       <div class="food-emoji">${food.emoji}</div>
       <div class="food-name">${food.name}</div>
       <div class="food-meta">
@@ -949,6 +1032,8 @@ function openManualModal() {
   document.getElementById('manualCal').value  = '';
   document.getElementById('manualProt').value = '';
   document.getElementById('manualNote').value = '';
+  document.getElementById('manualStep1').style.display = '';
+  document.getElementById('manualStep2').style.display = 'none';
   document.getElementById('manualModal').classList.add('open');
   setTimeout(() => document.getElementById('manualName').focus(), 300);
 }
@@ -958,6 +1043,7 @@ function closeManualModal(e) {
 }
 function closeManualDirect() {
   document.getElementById('manualModal').classList.remove('open');
+  pendingManualItem = null;
 }
 
 function confirmManual() {
@@ -968,9 +1054,25 @@ function confirmManual() {
 
   if (!name) { showToast('נא להכניס שם 😊'); return; }
 
-  const food = { id: 'manual_' + Date.now(), name, emoji: '🍽️' };
-  const label = note || '1 יחידה';
-  addItem(food, cal, prot, 1, label);
+  const id = 'custom_' + Date.now();
+  pendingManualItem = { id, name, emoji: '🍽️', cal, prot, label: note || '1 יחידה', isCustom: true, type: 'simple' };
+
+  // Add to today's log immediately
+  addItem(pendingManualItem, cal, prot, 1, pendingManualItem.label);
+
+  // Show step 2: save as permanent?
+  document.getElementById('manualStep1').style.display = 'none';
+  document.getElementById('permSubText').textContent = `${name} · ${cal} קל · ${prot}g חלבון\n\nאם כן, יופיע בגריד לתמיד`;
+  document.getElementById('manualStep2').style.display = '';
+}
+
+function saveAsPermanent(yes) {
+  if (yes && pendingManualItem) {
+    customFoods.push(pendingManualItem);
+    saveCustomFoods();
+    renderGrid();
+    showToast(`⭐ ${pendingManualItem.name} נשמר כמוצר קבוע!`);
+  }
   closeManualDirect();
 }
 
@@ -1076,6 +1178,7 @@ function setDate() {
 
 // ── INIT ──
 loadState();
+loadCustomFoods();
 renderGrid();
 updateUI();
 setDate();
