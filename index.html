@@ -98,6 +98,24 @@
       letter-spacing: 0.06em;
     }
 
+    /* ── CATEGORY HEADER ── */
+    .cat-header {
+      padding: 14px 14px 6px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cat-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      margin-right: 4px;
+    }
+
     /* ── FOOD GRID ── */
     .food-grid {
       display: grid;
@@ -620,7 +638,7 @@
 
 <!-- Food Grid -->
 <div class="section-title">בחר מה אכלת</div>
-<div class="food-grid" id="foodGrid"></div>
+<div id="foodGrid"></div>
 
 <!-- Manual Add Button -->
 <div class="manual-btn-wrap">
@@ -745,34 +763,58 @@
 
 <script>
 // ── FOOD DATA ──
-const FOODS = [
-  { id: 'tuna',        name: 'טונה',             emoji: '🐟', cal: 180,  prot: 25, type: 'simple' },
-  { id: 'mayo',        name: 'כף מיונז',         emoji: '🥄', cal: 35,   prot: 0,  type: 'simple' },
-  { id: 'pickles',     name: 'חמוצים',           emoji: '🥒', cal: 10,   prot: 0,  type: 'simple' },
-  { id: 'cracker',     name: 'קרקר פיטנס',      emoji: '🍪', cal: 20,   prot: 1,  type: 'cracker' },
-  { id: 'kartiv',      name: 'קרטיב שלוק',      emoji: '🥛', cal: 24,   prot: 0,  type: 'simple' },
-  { id: 'pita',        name: 'פיתה כוסמין',     emoji: '🫓', cal: 120,  prot: 4,  type: 'simple' },
-  { id: 'pita_pro',    name: 'פיתה חלבון',      emoji: '💪', cal: 160,  prot: 15, type: 'simple' },
-  { id: 'tortilla',    name: 'טורטיה',           emoji: '🌯', cal: 150,  prot: 5,  type: 'simple' },
-  { id: 'egg',         name: 'ביצה',             emoji: '🥚', cal: 70,   prot: 6,  type: 'eggs' },
-  { id: 'cheese',      name: 'גבינה 9%',         emoji: '🧀', cal: 60,   prot: 5,  type: 'simple' },
-  { id: 'symphony',    name: 'גבינת סימפוניה',   emoji: '🫙', cal: 25,   prot: 1,  type: 'simple' },
-  { id: 'ketchup',     name: 'קטשופ',            emoji: '🍅', cal: 15,   prot: 0,  type: 'simple' },
-  { id: 'olive_oil',   name: 'כף שמן זית',       emoji: '🫒', cal: 120,  prot: 0,  type: 'simple' },
-  { id: 'veggies',     name: 'ירקות',            emoji: '🥗', cal: 30,   prot: 2,  type: 'simple' },
-  { id: 'apple',       name: 'תפוח ירוק',        emoji: '🍏', cal: 80,   prot: 0,  type: 'simple' },
-  { id: 'potato',      name: 'תפוח אדמה',        emoji: '🥔', cal: 77,   prot: 2,  type: 'weight', calPer100: 77,  protPer100: 2  },
-  { id: 'sweet_pot',   name: 'בטטה',             emoji: '🍠', cal: 86,   prot: 2,  type: 'weight', calPer100: 86,  protPer100: 2  },
-  { id: 'zucchini',    name: 'שעועית ירוקה',     emoji: '🫛', cal: 31,   prot: 2,  type: 'weight', calPer100: 31,  protPer100: 2  },
-  { id: 'peas',        name: 'אפונה',            emoji: '🟢', cal: 81,   prot: 5,  type: 'weight', calPer100: 81,  protPer100: 5  },
-  { id: 'popcorn',     name: 'פופקורן',          emoji: '🍿', cal: 400,  prot: 10, type: 'weight', calPer100: 400, protPer100: 10 },
-  { id: 'chicken',     name: 'חזה עוף',          emoji: '🍗', cal: 165,  prot: 31, type: 'weight', calPer100: 165,  protPer100: 31 },
-  { id: 'thigh',       name: 'פרגית',            emoji: '🍖', cal: 220,  prot: 25, type: 'weight', calPer100: 220,  protPer100: 25 },
-  { id: 'beef',        name: 'בשר בקר',          emoji: '🥩', cal: 250,  prot: 26, type: 'weight', calPer100: 250,  protPer100: 26 },
-  { id: 'salmon',      name: 'דג סלמון',         emoji: '🐠', cal: 208,  prot: 20, type: 'weight', calPer100: 208,  protPer100: 20 },
-  { id: 'smoked_salm', name: 'סלמון מעושן',      emoji: '🍣', cal: 117,  prot: 18, type: 'weight', calPer100: 117,  protPer100: 18 },
-  { id: 'avocado',     name: 'אבוקדו',           emoji: '🥑', cal: 160,  prot: 2,  type: 'weight', calPer100: 160,  protPer100: 2  },
+const FOOD_CATEGORIES = [
+  {
+    id: 'protein', label: '💪 חלבון', foods: [
+      { id: 'chicken',     name: 'חזה עוף',      emoji: '🍗', cal: 165, prot: 31, type: 'weight', calPer100: 165, protPer100: 31 },
+      { id: 'thigh',       name: 'פרגית',        emoji: '🍖', cal: 220, prot: 25, type: 'weight', calPer100: 220, protPer100: 25 },
+      { id: 'beef',        name: 'בשר בקר',      emoji: '🥩', cal: 250, prot: 26, type: 'weight', calPer100: 250, protPer100: 26 },
+      { id: 'salmon',      name: 'דג סלמון',     emoji: '🐠', cal: 208, prot: 20, type: 'weight', calPer100: 208, protPer100: 20 },
+      { id: 'smoked_salm', name: 'סלמון מעושן',  emoji: '🍣', cal: 117, prot: 18, type: 'weight', calPer100: 117, protPer100: 18 },
+      { id: 'tuna',        name: 'טונה',         emoji: '🐟', cal: 180, prot: 25, type: 'simple' },
+      { id: 'egg',         name: 'ביצה',         emoji: '🥚', cal: 70,  prot: 6,  type: 'eggs'   },
+    ]
+  },
+  {
+    id: 'carbs', label: '🌾 פחמימות', foods: [
+      { id: 'pita',      name: 'פיתה כוסמין', emoji: '🫓', cal: 120, prot: 4,  type: 'simple' },
+      { id: 'pita_pro',  name: 'פיתה חלבון',  emoji: '💪', cal: 160, prot: 15, type: 'simple' },
+      { id: 'tortilla',  name: 'טורטיה',      emoji: '🌯', cal: 150, prot: 5,  type: 'simple' },
+      { id: 'potato',    name: 'תפוח אדמה',   emoji: '🥔', cal: 77,  prot: 2,  type: 'weight', calPer100: 77,  protPer100: 2  },
+      { id: 'sweet_pot', name: 'בטטה',        emoji: '🍠', cal: 86,  prot: 2,  type: 'weight', calPer100: 86,  protPer100: 2  },
+    ]
+  },
+  {
+    id: 'snacks', label: '🍿 חטיפים', foods: [
+      { id: 'kartiv',   name: 'קרטיב שלוק',  emoji: '🥛', cal: 24,  prot: 0, type: 'simple' },
+      { id: 'cracker',  name: 'קרקר פיטנס',  emoji: '🍪', cal: 20,  prot: 1, type: 'cracker' },
+      { id: 'medjool',  name: 'תמר מג׳הול',  emoji: '🌴', cal: 66,  prot: 0, type: 'simple' },
+      { id: 'apple',    name: 'תפוח ירוק',   emoji: '🍏', cal: 80,  prot: 0, type: 'simple' },
+      { id: 'popcorn',  name: 'פופקורן',     emoji: '🍿', cal: 400, prot: 10, type: 'weight', calPer100: 400, protPer100: 10, gramOptions: [15, 25, 40, 60] },
+    ]
+  },
+  {
+    id: 'veggies', label: '🥦 ירקות', foods: [
+      { id: 'veggies',   name: 'ירקות מעורב', emoji: '🥗', cal: 30,  prot: 2, type: 'simple' },
+      { id: 'avocado',   name: 'אבוקדו',      emoji: '🥑', cal: 160, prot: 2, type: 'weight', calPer100: 160, protPer100: 2  },
+      { id: 'zucchini',  name: 'שעועית ירוקה',emoji: '🫛', cal: 31,  prot: 2, type: 'weight', calPer100: 31,  protPer100: 2  },
+      { id: 'peas',      name: 'אפונה',       emoji: '🟢', cal: 81,  prot: 5, type: 'weight', calPer100: 81,  protPer100: 5  },
+      { id: 'pickles',   name: 'חמוצים',      emoji: '🥒', cal: 10,  prot: 0, type: 'simple' },
+    ]
+  },
+  {
+    id: 'sauces', label: '🧴 רטבים ותוספות', foods: [
+      { id: 'mayo',      name: 'כף מיונז',      emoji: '🥄', cal: 35,  prot: 0, type: 'simple' },
+      { id: 'ketchup',   name: 'קטשופ',         emoji: '🍅', cal: 15,  prot: 0, type: 'simple' },
+      { id: 'symphony',  name: 'גבינת סימפוניה',emoji: '🫙', cal: 25,  prot: 1, type: 'simple' },
+      { id: 'cheese',    name: 'גבינה 9%',      emoji: '🧀', cal: 60,  prot: 5, type: 'simple' },
+      { id: 'olive_oil', name: 'כף שמן זית',    emoji: '🫒', cal: 120, prot: 0, type: 'simple' },
+    ]
+  },
 ];
+
+// Flat list for lookups
+const FOODS = FOOD_CATEGORIES.flatMap(c => c.foods);
 
 const CAL_GOAL  = 1700;
 const PROT_GOAL = 150;
@@ -842,27 +884,53 @@ function updateUI() {
 }
 
 // ── RENDER GRID ──
+function makeFoodCard(food) {
+  const div = document.createElement('div');
+  div.className = 'food-card';
+  div.id = 'fc_' + food.id;
+  const displayCal  = food.type === 'weight' ? `${food.calPer100} קל/100g` : `${food.cal} קל`;
+  const displayProt = food.type === 'weight' ? `${food.protPer100}g/100g`  : `${food.prot}g חלבון`;
+  div.innerHTML = `
+    ${food.isCustom ? '<div class="custom-food-badge">שלי</div>' : ''}
+    <div class="food-emoji">${food.emoji}</div>
+    <div class="food-name">${food.name}</div>
+    <div class="food-meta">
+      <span class="cal">${displayCal}</span><br>
+      <span class="prot">${displayProt}</span>
+    </div>`;
+  div.addEventListener('click', e => { addRipple(div, e); handleFoodClick(food); });
+  return div;
+}
+
 function renderGrid() {
-  const grid = document.getElementById('foodGrid');
-  grid.innerHTML = '';
-  const allFoods = [...FOODS, ...customFoods];
-  allFoods.forEach(food => {
-    const div = document.createElement('div');
-    div.className = 'food-card';
-    div.id = 'fc_' + food.id;
-    const displayCal  = food.type === 'weight' ? `${food.calPer100} קל/100g` : `${food.cal} קל`;
-    const displayProt = food.type === 'weight' ? `${food.protPer100}g/100g`  : `${food.prot}g חלבון`;
-    div.innerHTML = `
-      ${food.isCustom ? '<div class="custom-food-badge">שלי</div>' : ''}
-      <div class="food-emoji">${food.emoji}</div>
-      <div class="food-name">${food.name}</div>
-      <div class="food-meta">
-        <span class="cal">${displayCal}</span><br>
-        <span class="prot">${displayProt}</span>
-      </div>`;
-    div.addEventListener('click', e => { addRipple(div, e); handleFoodClick(food); });
-    grid.appendChild(div);
+  const container = document.getElementById('foodGrid');
+  container.innerHTML = '';
+
+  // Built-in categories
+  FOOD_CATEGORIES.forEach(cat => {
+    const header = document.createElement('div');
+    header.className = 'cat-header';
+    header.textContent = cat.label;
+    container.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.className = 'food-grid';
+    cat.foods.forEach(food => grid.appendChild(makeFoodCard(food)));
+    container.appendChild(grid);
   });
+
+  // Custom foods section
+  if (customFoods.length > 0) {
+    const header = document.createElement('div');
+    header.className = 'cat-header';
+    header.textContent = '⭐ המאכלים שלי';
+    container.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.className = 'food-grid';
+    customFoods.forEach(food => grid.appendChild(makeFoodCard(food)));
+    container.appendChild(grid);
+  }
 }
 
 function addRipple(el, e) {
@@ -902,7 +970,7 @@ function addItem(food, cal, prot, qty, label) {
 
 // ── WEIGHT MODAL BODY ──
 function buildWeightBody(food) {
-  const opts = [50, 100, 150, 200];
+  const opts = food.gramOptions || [50, 100, 150, 200];
   return `
     <div class="qty-options">
       ${opts.map(g => `
