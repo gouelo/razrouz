@@ -28,7 +28,6 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
 
     body {
@@ -50,20 +49,10 @@
       z-index: 100;
       box-shadow: 0 4px 20px rgba(22,163,74,0.3);
     }
+    .app-header h1 { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; }
+    .app-header .date-line { font-size: 0.78rem; opacity: 0.8; margin-top: 2px; }
 
-    .app-header h1 {
-      font-size: 1.1rem;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-    }
-
-    .app-header .date-line {
-      font-size: 0.78rem;
-      opacity: 0.8;
-      margin-top: 2px;
-    }
-
-    /* ── MOTIVATION BANNER ── */
+    /* ── MOTIVATION ── */
     .motivation {
       background: white;
       border-bottom: 1px solid var(--border);
@@ -74,22 +63,14 @@
       color: var(--accent);
     }
 
-    /* ── PROGRESS BARS SECTION ── */
+    /* ── PROGRESS BARS ── */
     .progress-section {
       background: white;
       padding: 16px;
       border-bottom: 1px solid var(--border);
     }
-
-    .progress-row {
-      display: flex;
-      gap: 12px;
-    }
-
-    .progress-item {
-      flex: 1;
-    }
-
+    .progress-row { display: flex; gap: 12px; }
+    .progress-item { flex: 1; }
     .progress-label {
       display: flex;
       justify-content: space-between;
@@ -98,26 +79,13 @@
       font-weight: 600;
       margin-bottom: 6px;
     }
-
     .progress-label .prog-name { color: var(--text-muted); }
     .progress-label .prog-val { color: var(--text); }
-
-    .progress-bar-bg {
-      background: #f1f5f9;
-      border-radius: 999px;
-      height: 10px;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .cal-bar .progress-bar-fill { background: linear-gradient(90deg, #16a34a, #4ade80); }
-    .protein-bar .progress-bar-fill { background: linear-gradient(90deg, #0ea5e9, #38bdf8); }
-    .progress-bar-fill.danger { background: linear-gradient(90deg, #ef4444, #f87171) !important; }
+    .progress-bar-bg { background: #f1f5f9; border-radius: 999px; height: 10px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 999px; transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .cal-bar .progress-bar-fill    { background: linear-gradient(90deg, #16a34a, #4ade80); }
+    .protein-bar .progress-bar-fill{ background: linear-gradient(90deg, #0ea5e9, #38bdf8); }
+    .progress-bar-fill.danger  { background: linear-gradient(90deg, #ef4444, #f87171) !important; }
     .progress-bar-fill.warning { background: linear-gradient(90deg, #f59e0b, #fbbf24) !important; }
 
     /* ── SECTION TITLE ── */
@@ -137,16 +105,13 @@
       gap: 10px;
       padding: 0 12px 12px;
     }
-
-    @media (min-width: 480px) {
-      .food-grid { grid-template-columns: repeat(4, 1fr); }
-    }
+    @media (min-width: 480px) { .food-grid { grid-template-columns: repeat(4, 1fr); } }
 
     .food-card {
       background: white;
       border-radius: 16px;
       border: 1.5px solid var(--border);
-      padding: 10px 8px 10px;
+      padding: 10px 8px;
       cursor: pointer;
       text-align: center;
       transition: all 0.18s ease;
@@ -155,44 +120,45 @@
       position: relative;
       overflow: hidden;
     }
-
-    .food-card:active {
-      transform: scale(0.93);
-    }
-
+    .food-card:active { transform: scale(0.93); }
     .food-card:hover {
       border-color: var(--accent);
       box-shadow: 0 4px 16px rgba(22,163,74,0.15);
       transform: translateY(-2px);
     }
-
-    .food-card .food-emoji {
-      font-size: 2.2rem;
-      line-height: 1;
-      margin-bottom: 5px;
-    }
-
-    .food-card .food-name {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 4px;
-      line-height: 1.2;
-    }
-
-    .food-card .food-meta {
-      font-size: 0.68rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .food-card .food-meta .cal { color: var(--accent); font-weight: 700; }
+    .food-card .food-emoji { font-size: 2.2rem; line-height: 1; margin-bottom: 5px; }
+    .food-card .food-name  { font-size: 0.78rem; font-weight: 600; color: var(--text); margin-bottom: 4px; line-height: 1.2; }
+    .food-card .food-meta  { font-size: 0.68rem; color: var(--text-muted); line-height: 1.4; }
+    .food-card .food-meta .cal  { color: var(--accent); font-weight: 700; }
     .food-card .food-meta .prot { color: var(--protein-color); font-weight: 600; }
+    .food-card.added { border-color: var(--accent); background: var(--accent-light); }
 
-    .food-card.added {
-      border-color: var(--accent);
-      background: var(--accent-light);
+    /* ── MANUAL ADD BUTTON ── */
+    .manual-btn-wrap {
+      padding: 0 12px 16px;
     }
+    .manual-add-btn {
+      width: 100%;
+      background: white;
+      border: 2px dashed #86efac;
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent);
+      cursor: pointer;
+      font-family: 'Rubik', sans-serif;
+      transition: all 0.18s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .manual-add-btn:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
+    .manual-add-btn:active { transform: scale(0.98); }
 
     /* Ripple */
     .ripple {
@@ -207,7 +173,7 @@
       to   { transform: scale(4); opacity: 0; }
     }
 
-    /* ── QUANTITY MODAL ── */
+    /* ── MODAL BASE ── */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -225,68 +191,83 @@
       padding: 24px 20px 40px;
       width: 100%;
       max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
       animation: slideUp 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-
     @keyframes slideUp {
       from { transform: translateY(100%); opacity: 0; }
       to   { transform: translateY(0); opacity: 1; }
     }
 
-    .modal-handle {
-      width: 40px; height: 4px;
-      background: #e2e8f0;
-      border-radius: 2px;
-      margin: 0 auto 20px;
-    }
+    .modal-handle { width: 40px; height: 4px; background: #e2e8f0; border-radius: 2px; margin: 0 auto 20px; }
+    .modal-title  { font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 6px; }
+    .modal-emoji  { font-size: 3rem; text-align: center; margin-bottom: 16px; }
+    .modal-subtitle { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin-bottom: 20px; }
 
-    .modal-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 6px;
-    }
-
-    .modal-emoji {
-      font-size: 3rem;
-      text-align: center;
-      margin-bottom: 16px;
-    }
-
-    .modal-subtitle {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
+    /* ── QTY BUTTONS ── */
     .qty-options {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-      gap: 10px;
-      margin-bottom: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
     }
-
     .qty-btn {
       background: var(--surface);
       border: 2px solid var(--border);
       border-radius: 14px;
-      padding: 14px 8px;
+      padding: 12px 6px;
       cursor: pointer;
       text-align: center;
       transition: all 0.15s ease;
       font-family: 'Rubik', sans-serif;
     }
-
     .qty-btn:hover, .qty-btn.selected {
       border-color: var(--accent);
       background: var(--accent-light);
     }
+    .qty-btn .qty-label { font-size: 0.9rem; font-weight: 700; }
+    .qty-btn .qty-cal   { font-size: 0.68rem; color: var(--accent); font-weight: 600; }
+    .qty-btn .qty-prot  { font-size: 0.68rem; color: var(--protein-color); }
 
-    .qty-btn .qty-label { font-size: 0.95rem; font-weight: 700; }
-    .qty-btn .qty-cal   { font-size: 0.72rem; color: var(--accent); font-weight: 600; }
-    .qty-btn .qty-prot  { font-size: 0.72rem; color: var(--protein-color); }
+    /* ── CUSTOM GRAM INPUT ── */
+    .custom-gram-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .custom-gram-row label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .custom-gram-input {
+      flex: 1;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: 'Rubik', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+      text-align: center;
+    }
+    .custom-gram-input:focus { border-color: var(--accent); }
+    .custom-gram-preview {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      min-height: 20px;
+    }
+    .custom-gram-preview .cg-cal  { color: var(--accent); font-weight: 700; }
+    .custom-gram-preview .cg-prot { color: var(--protein-color); font-weight: 700; }
 
+    /* ── CRACKER QTY ── */
     .cracker-qty {
       display: flex;
       align-items: center;
@@ -307,12 +288,7 @@
       font-family: 'Rubik', sans-serif;
     }
     .cracker-qty button:active { transform: scale(0.9); }
-    .cracker-qty .cracker-num {
-      font-size: 2rem;
-      font-weight: 800;
-      min-width: 48px;
-      text-align: center;
-    }
+    .cracker-qty .cracker-num { font-size: 2rem; font-weight: 800; min-width: 48px; text-align: center; }
 
     .modal-confirm {
       width: 100%;
@@ -327,9 +303,9 @@
       font-family: 'Rubik', sans-serif;
       box-shadow: 0 4px 16px rgba(22,163,74,0.3);
       transition: all 0.18s;
+      margin-top: 4px;
     }
     .modal-confirm:active { transform: scale(0.97); }
-
     .modal-cancel {
       width: 100%;
       background: none;
@@ -342,7 +318,31 @@
       font-family: 'Rubik', sans-serif;
     }
 
-    /* ── FLOATING BASKET ── */
+    /* ── MANUAL FORM ── */
+    .manual-form { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      font-family: 'Rubik', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus { border-color: var(--accent); }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
+
+    /* ── BASKET ── */
     .basket {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -352,13 +352,7 @@
       z-index: 150;
       padding: 12px 16px 20px;
     }
-
-    .basket-summary {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
+    .basket-summary { display: flex; gap: 10px; margin-bottom: 10px; }
     .basket-stat {
       flex: 1;
       background: var(--surface);
@@ -366,36 +360,12 @@
       padding: 10px 8px;
       text-align: center;
     }
-
-    .basket-stat .bs-label {
-      font-size: 0.68rem;
-      color: var(--text-muted);
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .basket-stat .bs-val {
-      font-size: 1.2rem;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .basket-stat .bs-remaining {
-      font-size: 0.68rem;
-      font-weight: 600;
-      margin-top: 2px;
-    }
-
-    .basket-stat.cal-stat .bs-val { color: var(--accent); }
+    .basket-stat .bs-label  { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
+    .basket-stat .bs-val    { font-size: 1.2rem; font-weight: 800; line-height: 1; }
+    .basket-stat .bs-remaining { font-size: 0.68rem; font-weight: 600; margin-top: 2px; color: var(--text-muted); }
+    .basket-stat.cal-stat .bs-val  { color: var(--accent); }
     .basket-stat.prot-stat .bs-val { color: var(--protein-color); }
-    .basket-stat.cal-stat .bs-remaining { color: var(--text-muted); }
-    .basket-stat.prot-stat .bs-remaining { color: var(--text-muted); }
-
-    .basket-actions {
-      display: flex;
-      gap: 8px;
-    }
-
+    .basket-actions { display: flex; gap: 8px; }
     .btn-undo {
       background: var(--surface);
       border: 1.5px solid var(--border);
@@ -410,7 +380,6 @@
       transition: all 0.15s;
     }
     .btn-undo:active { transform: scale(0.95); }
-
     .btn-history {
       background: var(--surface);
       border: 1.5px solid var(--border);
@@ -423,7 +392,6 @@
       font-family: 'Rubik', sans-serif;
       transition: all 0.15s;
     }
-
     .btn-done {
       flex: 1;
       background: linear-gradient(135deg, #16a34a, #059669);
@@ -450,7 +418,6 @@
       align-items: flex-end;
     }
     .log-panel.open { display: flex; }
-
     .log-sheet {
       background: white;
       border-radius: 24px 24px 0 0;
@@ -460,14 +427,7 @@
       overflow-y: auto;
       animation: slideUp 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-
-    .log-sheet h3 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
+    .log-sheet h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; text-align: center; }
     .log-item {
       display: flex;
       align-items: center;
@@ -475,15 +435,11 @@
       padding: 10px 0;
       border-bottom: 1px solid var(--border);
     }
-
     .log-item:last-child { border-bottom: none; }
-
     .log-emoji { font-size: 1.6rem; }
-
     .log-info { flex: 1; }
     .log-info .log-name { font-weight: 600; font-size: 0.9rem; }
     .log-info .log-meta { font-size: 0.75rem; color: var(--text-muted); }
-
     .log-remove {
       background: none;
       border: none;
@@ -495,7 +451,6 @@
       transition: background 0.15s;
     }
     .log-remove:hover { background: #fee2e2; }
-
     .log-close {
       width: 100%;
       background: var(--surface);
@@ -510,7 +465,7 @@
       font-family: 'Rubik', sans-serif;
     }
 
-    /* ── SUMMARY SCREEN ── */
+    /* ── SUMMARY ── */
     .summary-overlay {
       display: none;
       position: fixed;
@@ -524,33 +479,14 @@
       text-align: center;
     }
     .summary-overlay.open { display: flex; }
-
     .summary-emoji { font-size: 5rem; margin-bottom: 16px; animation: bounce 1s infinite; }
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
       50%       { transform: translateY(-12px); }
     }
-
-    .summary-title {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: white;
-      margin-bottom: 12px;
-    }
-
-    .summary-msg {
-      font-size: 1rem;
-      color: rgba(255,255,255,0.7);
-      margin-bottom: 32px;
-      line-height: 1.6;
-    }
-
-    .summary-stats {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
+    .summary-title { font-size: 1.8rem; font-weight: 800; color: white; margin-bottom: 12px; }
+    .summary-msg   { font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 32px; line-height: 1.6; white-space: pre-line; }
+    .summary-stats { display: flex; gap: 16px; margin-bottom: 32px; }
     .summary-stat {
       background: rgba(255,255,255,0.1);
       border: 1px solid rgba(255,255,255,0.15);
@@ -558,19 +494,8 @@
       padding: 20px 24px;
       min-width: 120px;
     }
-
-    .summary-stat .ss-val {
-      font-size: 2rem;
-      font-weight: 800;
-      color: white;
-    }
-
-    .summary-stat .ss-label {
-      font-size: 0.78rem;
-      color: rgba(255,255,255,0.6);
-      margin-top: 4px;
-    }
-
+    .summary-stat .ss-val   { font-size: 2rem; font-weight: 800; color: white; }
+    .summary-stat .ss-label { font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
     .btn-new-day {
       background: linear-gradient(135deg, #16a34a, #4ade80);
       color: white;
@@ -604,18 +529,10 @@
       white-space: nowrap;
       pointer-events: none;
     }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* ── EMPTY STATE ── */
-    .empty-basket {
-      text-align: center;
-      padding: 8px 0;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
+    .empty-basket { text-align: center; padding: 8px 0; font-size: 0.8rem; color: var(--text-muted); }
   </style>
 </head>
 <body>
@@ -637,18 +554,14 @@
         <span class="prog-name">🔥 קלוריות</span>
         <span class="prog-val" id="calLabel">0 / 1700</span>
       </div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="calBar" style="width:0%"></div>
-      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="calBar" style="width:0%"></div></div>
     </div>
     <div class="progress-item protein-bar">
       <div class="progress-label">
         <span class="prog-name">💪 חלבון</span>
         <span class="prog-val" id="protLabel">0 / 150g</span>
       </div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="protBar" style="width:0%"></div>
-      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="protBar" style="width:0%"></div></div>
     </div>
   </div>
 </div>
@@ -656,6 +569,13 @@
 <!-- Food Grid -->
 <div class="section-title">בחר מה אכלת</div>
 <div class="food-grid" id="foodGrid"></div>
+
+<!-- Manual Add Button -->
+<div class="manual-btn-wrap">
+  <button class="manual-add-btn" onclick="openManualModal()">
+    <i class="fa fa-plus-circle"></i> הוספה ידנית
+  </button>
+</div>
 
 <!-- Floating Basket -->
 <div class="basket">
@@ -688,6 +608,38 @@
     <div id="modalBody"></div>
     <button class="modal-confirm" onclick="confirmAdd()">הוסף ✓</button>
     <button class="modal-cancel" onclick="closeModalDirect()">ביטול</button>
+  </div>
+</div>
+
+<!-- Manual Entry Modal -->
+<div class="modal-overlay" id="manualModal" onclick="closeManualModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-emoji">✏️</div>
+    <div class="modal-title">הוספה ידנית</div>
+    <div class="modal-subtitle">הכנס את פרטי המאכל</div>
+    <div class="manual-form">
+      <div class="form-group">
+        <label>שם המאכל</label>
+        <input class="form-input" id="manualName" type="text" placeholder="לדוגמה: שוקולד מריר" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>קלוריות</label>
+          <input class="form-input" id="manualCal" type="number" placeholder="0" inputmode="numeric" />
+        </div>
+        <div class="form-group">
+          <label>חלבון (g)</label>
+          <input class="form-input" id="manualProt" type="number" placeholder="0" inputmode="numeric" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>הערה (אופציונלי)</label>
+        <input class="form-input" id="manualNote" type="text" placeholder="כמות, הכנה..." />
+      </div>
+    </div>
+    <button class="modal-confirm" onclick="confirmManual()">הוסף ✓</button>
+    <button class="modal-cancel" onclick="closeManualDirect()">ביטול</button>
   </div>
 </div>
 
@@ -725,29 +677,33 @@
 <script>
 // ── FOOD DATA ──
 const FOODS = [
-  { id: 'tuna',      name: 'טונה',           emoji: '🐟', cal: 180,  prot: 25, type: 'simple' },
-  { id: 'mayo',      name: 'כף מיונז',       emoji: '🥄', cal: 35,   prot: 0,  type: 'simple' },
-  { id: 'pickles',   name: 'חמוצים',         emoji: '🥒', cal: 10,   prot: 0,  type: 'simple' },
-  { id: 'cracker',   name: 'קרקר פיטנס',    emoji: '🍪', cal: 20,   prot: 1,  type: 'cracker' },
-  { id: 'pita',      name: 'פיתה כוסמין',   emoji: '🫓', cal: 120,  prot: 4,  type: 'simple' },
-  { id: 'pita_pro',  name: 'פיתה חלבון',    emoji: '💪', cal: 160,  prot: 15, type: 'simple' },
-  { id: 'chicken',   name: 'חזה עוף',        emoji: '🍗', cal: 165,  prot: 31, type: 'weight', calPer100: 165, protPer100: 31 },
-  { id: 'thigh',     name: 'פרגית',          emoji: '🍖', cal: 220,  prot: 25, type: 'weight', calPer100: 220, protPer100: 25 },
-  { id: 'beef',      name: 'בשר בקר',        emoji: '🥩', cal: 250,  prot: 26, type: 'weight', calPer100: 250, protPer100: 26 },
-  { id: 'tortilla',  name: 'טורטיה',         emoji: '🌯', cal: 150,  prot: 5,  type: 'simple' },
-  { id: 'egg',       name: 'ביצה',           emoji: '🥚', cal: 70,   prot: 6,  type: 'eggs' },
-  { id: 'cheese',    name: 'גבינה 9%',       emoji: '🧀', cal: 60,   prot: 5,  type: 'simple' },
-  { id: 'symphony',  name: 'גבינת סימפוניה', emoji: '🫙', cal: 25,   prot: 1,  type: 'simple' },
-  { id: 'ketchup',   name: 'קטשופ',          emoji: '🍅', cal: 15,   prot: 0,  type: 'simple' },
+  { id: 'tuna',        name: 'טונה',             emoji: '🐟', cal: 180,  prot: 25, type: 'simple' },
+  { id: 'mayo',        name: 'כף מיונז',         emoji: '🥄', cal: 35,   prot: 0,  type: 'simple' },
+  { id: 'pickles',     name: 'חמוצים',           emoji: '🥒', cal: 10,   prot: 0,  type: 'simple' },
+  { id: 'cracker',     name: 'קרקר פיטנס',      emoji: '🍪', cal: 20,   prot: 1,  type: 'cracker' },
+  { id: 'kartiv',      name: 'קרטיב שלוק',      emoji: '🥛', cal: 24,   prot: 0,  type: 'simple' },
+  { id: 'pita',        name: 'פיתה כוסמין',     emoji: '🫓', cal: 120,  prot: 4,  type: 'simple' },
+  { id: 'pita_pro',    name: 'פיתה חלבון',      emoji: '💪', cal: 160,  prot: 15, type: 'simple' },
+  { id: 'tortilla',    name: 'טורטיה',           emoji: '🌯', cal: 150,  prot: 5,  type: 'simple' },
+  { id: 'egg',         name: 'ביצה',             emoji: '🥚', cal: 70,   prot: 6,  type: 'eggs' },
+  { id: 'cheese',      name: 'גבינה 9%',         emoji: '🧀', cal: 60,   prot: 5,  type: 'simple' },
+  { id: 'symphony',    name: 'גבינת סימפוניה',   emoji: '🫙', cal: 25,   prot: 1,  type: 'simple' },
+  { id: 'ketchup',     name: 'קטשופ',            emoji: '🍅', cal: 15,   prot: 0,  type: 'simple' },
+  { id: 'apple',       name: 'תפוח ירוק',        emoji: '🍏', cal: 80,   prot: 0,  type: 'simple' },
+  { id: 'chicken',     name: 'חזה עוף',          emoji: '🍗', cal: 165,  prot: 31, type: 'weight', calPer100: 165,  protPer100: 31 },
+  { id: 'thigh',       name: 'פרגית',            emoji: '🍖', cal: 220,  prot: 25, type: 'weight', calPer100: 220,  protPer100: 25 },
+  { id: 'beef',        name: 'בשר בקר',          emoji: '🥩', cal: 250,  prot: 26, type: 'weight', calPer100: 250,  protPer100: 26 },
+  { id: 'salmon',      name: 'דג סלמון',         emoji: '🐠', cal: 208,  prot: 20, type: 'weight', calPer100: 208,  protPer100: 20 },
+  { id: 'smoked_salm', name: 'סלמון מעושן',      emoji: '🍣', cal: 117,  prot: 18, type: 'weight', calPer100: 117,  protPer100: 18 },
+  { id: 'avocado',     name: 'אבוקדו',           emoji: '🥑', cal: 160,  prot: 2,  type: 'weight', calPer100: 160,  protPer100: 2  },
 ];
 
-const CAL_GOAL = 1700;
+const CAL_GOAL  = 1700;
 const PROT_GOAL = 150;
 
 // ── STATE ──
-let log = [];      // { foodId, name, emoji, cal, prot, qty, label }
-let history = [];  // for undo
-
+let log     = [];
+let history = [];
 let pendingFood = null;
 let pendingQty  = null;
 let crackerCount = 1;
@@ -760,11 +716,8 @@ function saveState() {
 }
 
 function loadState() {
-  // Clear old days
   Object.keys(localStorage).forEach(k => {
-    if (k.startsWith('cal_log_') && !k.endsWith(TODAY)) {
-      localStorage.removeItem(k);
-    }
+    if (k.startsWith('cal_log_') && !k.endsWith(TODAY)) localStorage.removeItem(k);
   });
   const saved = localStorage.getItem('cal_log_' + TODAY);
   if (saved) log = JSON.parse(saved);
@@ -772,19 +725,14 @@ function loadState() {
 
 // ── TOTALS ──
 function getTotals() {
-  return log.reduce((acc, item) => {
-    acc.cal  += item.cal;
-    acc.prot += item.prot;
-    return acc;
-  }, { cal: 0, prot: 0 });
+  return log.reduce((acc, item) => ({ cal: acc.cal + item.cal, prot: acc.prot + item.prot }), { cal: 0, prot: 0 });
 }
 
 // ── UI UPDATE ──
 function updateUI() {
   const { cal, prot } = getTotals();
 
-  // Progress bars
-  const calPct  = Math.min((cal / CAL_GOAL) * 100, 100);
+  const calPct  = Math.min((cal  / CAL_GOAL)  * 100, 100);
   const protPct = Math.min((prot / PROT_GOAL) * 100, 100);
 
   document.getElementById('calLabel').textContent  = `${cal} / ${CAL_GOAL}`;
@@ -792,14 +740,11 @@ function updateUI() {
 
   const calBarEl  = document.getElementById('calBar');
   const protBarEl = document.getElementById('protBar');
-
   calBarEl.style.width  = calPct  + '%';
   protBarEl.style.width = protPct + '%';
-
   calBarEl.className  = 'progress-bar-fill' + (cal > CAL_GOAL ? ' danger' : cal > 1500 ? ' warning' : '');
   protBarEl.className = 'progress-bar-fill';
 
-  // Basket
   document.getElementById('totalCal').textContent  = cal;
   document.getElementById('totalProt').textContent = prot + 'g';
   document.getElementById('remCal').textContent    = `נותר: ${Math.max(0, CAL_GOAL - cal)} קל`;
@@ -808,7 +753,7 @@ function updateUI() {
   saveState();
 }
 
-// ── RENDER FOOD GRID ──
+// ── RENDER GRID ──
 function renderGrid() {
   const grid = document.getElementById('foodGrid');
   grid.innerHTML = '';
@@ -816,18 +761,16 @@ function renderGrid() {
     const div = document.createElement('div');
     div.className = 'food-card';
     div.id = 'fc_' + food.id;
+    const displayCal  = food.type === 'weight' ? `${food.calPer100} קל/100g` : `${food.cal} קל`;
+    const displayProt = food.type === 'weight' ? `${food.protPer100}g/100g`  : `${food.prot}g חלבון`;
     div.innerHTML = `
       <div class="food-emoji">${food.emoji}</div>
       <div class="food-name">${food.name}</div>
       <div class="food-meta">
-        <span class="cal">${food.cal} קל</span><br>
-        <span class="prot">${food.prot}g חלבון</span>
-      </div>
-    `;
-    div.addEventListener('click', (e) => {
-      addRipple(div, e);
-      handleFoodClick(food);
-    });
+        <span class="cal">${displayCal}</span><br>
+        <span class="prot">${displayProt}</span>
+      </div>`;
+    div.addEventListener('click', e => { addRipple(div, e); handleFoodClick(food); });
     grid.appendChild(div);
   });
 }
@@ -861,11 +804,60 @@ function flashCard(id) {
 
 // ── ADD ITEM ──
 function addItem(food, cal, prot, qty, label) {
-  const entry = { foodId: food.id, name: food.name, emoji: food.emoji, cal, prot, qty, label };
   history.push(JSON.parse(JSON.stringify(log)));
-  log.push(entry);
+  log.push({ foodId: food.id, name: food.name, emoji: food.emoji, cal: Math.round(cal), prot: Math.round(prot), qty, label });
   updateUI();
   showToast(`${food.emoji} ${food.name} נוסף!`);
+}
+
+// ── WEIGHT MODAL BODY ──
+function buildWeightBody(food) {
+  const opts = [50, 100, 150, 200];
+  return `
+    <div class="qty-options">
+      ${opts.map(g => `
+        <div class="qty-btn" data-g="${g}" onclick="selectGram(${g}, this)">
+          <div class="qty-label">${g}g</div>
+          <div class="qty-cal">${Math.round(food.calPer100*g/100)} קל</div>
+          <div class="qty-prot">${Math.round(food.protPer100*g/100)}g</div>
+        </div>`).join('')}
+    </div>
+    <div class="custom-gram-row">
+      <label>כמות מותאמת:</label>
+      <input class="custom-gram-input" id="customGram" type="number" inputmode="numeric"
+        placeholder="הכנס גרמים" min="1" max="2000"
+        oninput="onCustomGramInput()" />
+      <span style="font-size:0.82rem;color:var(--text-muted);font-weight:600;">g</span>
+    </div>
+    <div class="custom-gram-preview" id="gramPreview"></div>`;
+}
+
+function selectGram(g, el) {
+  document.querySelectorAll('#modalBody .qty-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('customGram').value = '';
+  document.getElementById('gramPreview').innerHTML = '';
+  pendingQty = {
+    qty: g,
+    cal: Math.round(pendingFood.calPer100 * g / 100),
+    prot: Math.round(pendingFood.protPer100 * g / 100),
+    label: `${g}g`
+  };
+}
+
+function onCustomGramInput() {
+  const g = parseInt(document.getElementById('customGram').value);
+  document.querySelectorAll('#modalBody .qty-btn').forEach(b => b.classList.remove('selected'));
+  if (!g || g <= 0) {
+    document.getElementById('gramPreview').innerHTML = '';
+    pendingQty = null;
+    return;
+  }
+  const cal  = Math.round(pendingFood.calPer100 * g / 100);
+  const prot = Math.round(pendingFood.protPer100 * g / 100);
+  document.getElementById('gramPreview').innerHTML =
+    `<span class="cg-cal">${cal} קל</span> • <span class="cg-prot">${prot}g חלבון</span>`;
+  pendingQty = { qty: g, cal, prot, label: `${g}g` };
 }
 
 // ── MODAL ──
@@ -883,12 +875,12 @@ function openModal(food) {
     document.getElementById('modalSubtitle').textContent = 'כמה ביצים?';
     body.innerHTML = `
       <div class="qty-options">
-        <div class="qty-btn" onclick="selectQty(1, ${food.cal}, ${food.prot}, '1 ביצה')">
+        <div class="qty-btn" onclick="selectQty(1, ${food.cal}, ${food.prot}, '1 ביצה', this)">
           <div class="qty-label">1 ביצה</div>
           <div class="qty-cal">${food.cal} קל</div>
           <div class="qty-prot">${food.prot}g חלבון</div>
         </div>
-        <div class="qty-btn" onclick="selectQty(2, ${food.cal*2}, ${food.prot*2}, '2 ביצים')">
+        <div class="qty-btn" onclick="selectQty(2, ${food.cal*2}, ${food.prot*2}, '2 ביצים', this)">
           <div class="qty-label">2 ביצים</div>
           <div class="qty-cal">${food.cal*2} קל</div>
           <div class="qty-prot">${food.prot*2}g חלבון</div>
@@ -896,13 +888,7 @@ function openModal(food) {
       </div>`;
   } else if (food.type === 'weight') {
     document.getElementById('modalSubtitle').textContent = 'כמה גרם?';
-    const opts = [100, 150, 200];
-    body.innerHTML = `<div class="qty-options">${opts.map(g => `
-      <div class="qty-btn" onclick="selectQty(${g}, ${Math.round(food.calPer100*g/100)}, ${Math.round(food.protPer100*g/100)}, '${g}g')">
-        <div class="qty-label">${g}g</div>
-        <div class="qty-cal">${Math.round(food.calPer100*g/100)} קל</div>
-        <div class="qty-prot">${Math.round(food.protPer100*g/100)}g חלבון</div>
-      </div>`).join('')}</div>`;
+    body.innerHTML = buildWeightBody(food);
   } else if (food.type === 'cracker') {
     document.getElementById('modalSubtitle').textContent = 'כמה קרקרים?';
     body.innerHTML = `
@@ -919,33 +905,28 @@ function openModal(food) {
   document.getElementById('qtyModal').classList.add('open');
 }
 
-function selectQty(qty, cal, prot, label) {
-  document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('selected'));
-  event.currentTarget.classList.add('selected');
+function selectQty(qty, cal, prot, label, el) {
+  document.querySelectorAll('#modalBody .qty-btn').forEach(b => b.classList.remove('selected'));
+  if (el) el.classList.add('selected');
   pendingQty = { qty, cal, prot, label };
 }
 
 function changeCracker(delta) {
   crackerCount = Math.max(1, crackerCount + delta);
-  document.getElementById('crackerNum').textContent = crackerCount;
+  document.getElementById('crackerNum').textContent  = crackerCount;
   document.getElementById('crackerCal').textContent  = pendingFood.cal * crackerCount;
   document.getElementById('crackerProt').textContent = pendingFood.prot * crackerCount;
 }
 
 function confirmAdd() {
   if (!pendingFood) return;
-
   if (pendingFood.type === 'cracker') {
     addItem(pendingFood, pendingFood.cal * crackerCount, pendingFood.prot * crackerCount, crackerCount, `${crackerCount} יחידות`);
     flashCard(pendingFood.id);
     closeModalDirect();
     return;
   }
-
-  if (!pendingQty) {
-    showToast('בחר כמות קודם 😊');
-    return;
-  }
+  if (!pendingQty) { showToast('בחר כמות קודם 😊'); return; }
   addItem(pendingFood, pendingQty.cal, pendingQty.prot, pendingQty.qty, pendingQty.label);
   flashCard(pendingFood.id);
   closeModalDirect();
@@ -954,11 +935,41 @@ function confirmAdd() {
 function closeModal(e) {
   if (e.target === document.getElementById('qtyModal')) closeModalDirect();
 }
-
 function closeModalDirect() {
   document.getElementById('qtyModal').classList.remove('open');
   pendingFood = null;
   pendingQty  = null;
+}
+
+// ── MANUAL MODAL ──
+function openManualModal() {
+  document.getElementById('manualName').value = '';
+  document.getElementById('manualCal').value  = '';
+  document.getElementById('manualProt').value = '';
+  document.getElementById('manualNote').value = '';
+  document.getElementById('manualModal').classList.add('open');
+  setTimeout(() => document.getElementById('manualName').focus(), 300);
+}
+
+function closeManualModal(e) {
+  if (e.target === document.getElementById('manualModal')) closeManualDirect();
+}
+function closeManualDirect() {
+  document.getElementById('manualModal').classList.remove('open');
+}
+
+function confirmManual() {
+  const name = document.getElementById('manualName').value.trim();
+  const cal  = parseInt(document.getElementById('manualCal').value)  || 0;
+  const prot = parseInt(document.getElementById('manualProt').value) || 0;
+  const note = document.getElementById('manualNote').value.trim();
+
+  if (!name) { showToast('נא להכניס שם 😊'); return; }
+
+  const food = { id: 'manual_' + Date.now(), name, emoji: '🍽️' };
+  const label = note || '1 יחידה';
+  addItem(food, cal, prot, 1, label);
+  closeManualDirect();
 }
 
 // ── LOG ──
@@ -967,15 +978,27 @@ function openLog() {
   if (log.length === 0) {
     listEl.innerHTML = '<div class="empty-basket">עדיין לא הוספת כלום היום 😊</div>';
   } else {
-    listEl.innerHTML = log.map((item, i) => `
-      <div class="log-item" id="li_${i}">
+    const { cal, prot } = getTotals();
+    listEl.innerHTML = `
+      <div style="display:flex;gap:12px;margin-bottom:14px;">
+        <div style="flex:1;background:var(--accent-light);border-radius:12px;padding:10px;text-align:center;">
+          <div style="font-size:1.2rem;font-weight:800;color:var(--accent)">${cal}</div>
+          <div style="font-size:0.7rem;color:var(--text-muted);font-weight:600">קל סה"כ</div>
+        </div>
+        <div style="flex:1;background:var(--protein-light);border-radius:12px;padding:10px;text-align:center;">
+          <div style="font-size:1.2rem;font-weight:800;color:var(--protein-color)">${prot}g</div>
+          <div style="font-size:0.7rem;color:var(--text-muted);font-weight:600">חלבון סה"כ</div>
+        </div>
+      </div>
+      ${log.map((item, i) => `
+      <div class="log-item">
         <div class="log-emoji">${item.emoji}</div>
         <div class="log-info">
           <div class="log-name">${item.name}</div>
           <div class="log-meta">${item.label} · ${item.cal} קל · ${item.prot}g חלבון</div>
         </div>
         <button class="log-remove" onclick="removeItem(${i})"><i class="fa fa-trash"></i></button>
-      </div>`).join('');
+      </div>`).join('')}`;
   }
   document.getElementById('logPanel').classList.add('open');
 }
@@ -983,11 +1006,9 @@ function openLog() {
 function closeLog(e) {
   if (e.target === document.getElementById('logPanel')) closeLogDirect();
 }
-
 function closeLogDirect() {
   document.getElementById('logPanel').classList.remove('open');
 }
-
 function removeItem(i) {
   history.push(JSON.parse(JSON.stringify(log)));
   log.splice(i, 1);
@@ -1010,29 +1031,21 @@ function openSummary() {
   document.getElementById('summaryProtVal').textContent = prot + 'g';
 
   let emoji, title, msg;
-
   if (cal >= 1500 && cal <= 1700) {
-    emoji = '🎯';
-    title = 'אלוף! עמדת ביעד!';
-    msg   = 'עשית עבודה מדהימה היום יואל.\nהגוף שלך מודה לך 💪';
+    emoji = '🎯'; title = 'אלוף! עמדת ביעד!';
+    msg = 'עשית עבודה מדהימה היום יואל.\nהגוף שלך מודה לך 💪';
   } else if (cal > 1700) {
-    emoji = '💪';
-    title = 'מחר יום חדש!';
-    msg   = 'קצת עברת את היעד, אבל זה בסדר.\nמחר מתחילים מחדש עם כוחות חדשים!';
+    emoji = '💪'; title = 'מחר יום חדש!';
+    msg = 'קצת עברת את היעד, אבל זה בסדר.\nמחר מתחילים מחדש עם כוחות חדשים!';
   } else {
-    emoji = '⚡';
-    title = 'קרוב לביעד!';
-    msg   = 'לא הגעת ל-1500 קלוריות.\nוודא שאתה אוכל מספיק לתמיכת האימונים!';
+    emoji = '⚡'; title = 'קרוב לביעד!';
+    msg = 'לא הגעת ל-1500 קלוריות.\nוודא שאתה אוכל מספיק לתמיכת האימונים!';
   }
-
-  if (prot < 120) {
-    msg += '\n\n💡 תנסה להוסיף יותר חלבון מחר';
-  }
+  if (prot < 120) msg += '\n\n💡 תנסה להוסיף יותר חלבון מחר';
 
   document.getElementById('summaryEmoji').textContent = emoji;
   document.getElementById('summaryTitle').textContent = title;
   document.getElementById('summaryMsg').textContent   = msg;
-
   document.getElementById('summaryOverlay').classList.add('open');
 }
 
@@ -1051,9 +1064,8 @@ function showToast(msg) {
 // ── DATE ──
 function setDate() {
   const d = new Date();
-  const opts = { weekday: 'long', day: 'numeric', month: 'long', calendar: 'hebrew' };
   try {
-    const heb = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', opts).format(d);
+    const heb = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { weekday: 'long', day: 'numeric', month: 'long' }).format(d);
     document.getElementById('dateDisplay').textContent = heb;
   } catch {
     document.getElementById('dateDisplay').textContent = d.toLocaleDateString('he-IL');
