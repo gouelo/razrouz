@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>יואל — מעקב קלוריות 💪</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #f0fdf4;
+      --bg-2: #ffffff;
+      --surface: #f8fafc;
+      --border: rgba(0,0,0,0.07);
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --accent: #16a34a;
+      --accent-2: #0ea5e9;
+      --accent-light: #dcfce7;
+      --protein-color: #0ea5e9;
+      --protein-light: #e0f2fe;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --card-radius: 18px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 220px;
+    }
+
+    /* ── HEADER ── */
+    .app-header {
+      background: linear-gradient(135deg, #16a34a, #059669);
+      color: white;
+      padding: 20px 16px 16px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(22,163,74,0.3);
+    }
+
+    .app-header h1 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .app-header .date-line {
+      font-size: 0.78rem;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+
+    /* ── MOTIVATION BANNER ── */
+    .motivation {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+      text-align: center;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* ── PROGRESS BARS SECTION ── */
+    .progress-section {
+      background: white;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .progress-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .progress-item {
+      flex: 1;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .progress-label .prog-name { color: var(--text-muted); }
+    .progress-label .prog-val { color: var(--text); }
+
+    .progress-bar-bg {
+      background: #f1f5f9;
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .cal-bar .progress-bar-fill { background: linear-gradient(90deg, #16a34a, #4ade80); }
+    .protein-bar .progress-bar-fill { background: linear-gradient(90deg, #0ea5e9, #38bdf8); }
+    .progress-bar-fill.danger { background: linear-gradient(90deg, #ef4444, #f87171) !important; }
+    .progress-bar-fill.warning { background: linear-gradient(90deg, #f59e0b, #fbbf24) !important; }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      padding: 16px 16px 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── FOOD GRID ── */
+    .food-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 0 12px 12px;
+    }
+
+    @media (min-width: 480px) {
+      .food-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .food-card {
+      background: white;
+      border-radius: 16px;
+      border: 1.5px solid var(--border);
+      padding: 10px 8px 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.18s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .food-card:active {
+      transform: scale(0.93);
+    }
+
+    .food-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 16px rgba(22,163,74,0.15);
+      transform: translateY(-2px);
+    }
+
+    .food-card .food-emoji {
+      font-size: 2.2rem;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+
+    .food-card .food-name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+
+    .food-card .food-meta {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .food-card .food-meta .cal { color: var(--accent); font-weight: 700; }
+    .food-card .food-meta .prot { color: var(--protein-color); font-weight: 600; }
+
+    .food-card.added {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    /* Ripple */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(22,163,74,0.25);
+      animation: ripple-anim 0.5s linear;
+      pointer-events: none;
+    }
+    @keyframes ripple-anim {
+      from { transform: scale(0); opacity: 1; }
+      to   { transform: scale(4); opacity: 0; }
+    }
+
+    /* ── QUANTITY MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal-sheet {
+      background: white;
+      border-radius: 24px 24px 0 0;
+      padding: 24px 20px 40px;
+      width: 100%;
+      max-width: 480px;
+      animation: slideUp 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-handle {
+      width: 40px; height: 4px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .modal-emoji {
+      font-size: 3rem;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .qty-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .qty-btn {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    .qty-btn:hover, .qty-btn.selected {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .qty-btn .qty-label { font-size: 0.95rem; font-weight: 700; }
+    .qty-btn .qty-cal   { font-size: 0.72rem; color: var(--accent); font-weight: 600; }
+    .qty-btn .qty-prot  { font-size: 0.72rem; color: var(--protein-color); }
+
+    .cracker-qty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .cracker-qty button {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      background: white;
+      color: var(--accent);
+      font-size: 1.4rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Rubik', sans-serif;
+    }
+    .cracker-qty button:active { transform: scale(0.9); }
+    .cracker-qty .cracker-num {
+      font-size: 2rem;
+      font-weight: 800;
+      min-width: 48px;
+      text-align: center;
+    }
+
+    .modal-confirm {
+      width: 100%;
+      background: linear-gradient(135deg, #16a34a, #059669);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Rubik', sans-serif;
+      box-shadow: 0 4px 16px rgba(22,163,74,0.3);
+      transition: all 0.18s;
+    }
+    .modal-confirm:active { transform: scale(0.97); }
+
+    .modal-cancel {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 8px;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    /* ── FLOATING BASKET ── */
+    .basket {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: white;
+      border-top: 1px solid var(--border);
+      box-shadow: 0 -8px 32px rgba(0,0,0,0.12);
+      z-index: 150;
+      padding: 12px 16px 20px;
+    }
+
+    .basket-summary {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .basket-stat {
+      flex: 1;
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 10px 8px;
+      text-align: center;
+    }
+
+    .basket-stat .bs-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .basket-stat .bs-val {
+      font-size: 1.2rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .basket-stat .bs-remaining {
+      font-size: 0.68rem;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .basket-stat.cal-stat .bs-val { color: var(--accent); }
+    .basket-stat.prot-stat .bs-val { color: var(--protein-color); }
+    .basket-stat.cal-stat .bs-remaining { color: var(--text-muted); }
+    .basket-stat.prot-stat .bs-remaining { color: var(--text-muted); }
+
+    .basket-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-undo {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: 'Rubik', sans-serif;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .btn-undo:active { transform: scale(0.95); }
+
+    .btn-history {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: 'Rubik', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .btn-done {
+      flex: 1;
+      background: linear-gradient(135deg, #16a34a, #059669);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Rubik', sans-serif;
+      box-shadow: 0 4px 12px rgba(22,163,74,0.25);
+      transition: all 0.18s;
+    }
+    .btn-done:active { transform: scale(0.97); }
+
+    /* ── LOG PANEL ── */
+    .log-panel {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+      align-items: flex-end;
+    }
+    .log-panel.open { display: flex; }
+
+    .log-sheet {
+      background: white;
+      border-radius: 24px 24px 0 0;
+      padding: 20px 16px 40px;
+      width: 100%;
+      max-height: 70vh;
+      overflow-y: auto;
+      animation: slideUp 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .log-sheet h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .log-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .log-item:last-child { border-bottom: none; }
+
+    .log-emoji { font-size: 1.6rem; }
+
+    .log-info { flex: 1; }
+    .log-info .log-name { font-weight: 600; font-size: 0.9rem; }
+    .log-info .log-meta { font-size: 0.75rem; color: var(--text-muted); }
+
+    .log-remove {
+      background: none;
+      border: none;
+      color: var(--danger);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .log-remove:hover { background: #fee2e2; }
+
+    .log-close {
+      width: 100%;
+      background: var(--surface);
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      margin-top: 16px;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    /* ── SUMMARY SCREEN ── */
+    .summary-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #0f172a, #064e3b);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .summary-overlay.open { display: flex; }
+
+    .summary-emoji { font-size: 5rem; margin-bottom: 16px; animation: bounce 1s infinite; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-12px); }
+    }
+
+    .summary-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 12px;
+    }
+
+    .summary-msg {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .summary-stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .summary-stat {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      padding: 20px 24px;
+      min-width: 120px;
+    }
+
+    .summary-stat .ss-val {
+      font-size: 2rem;
+      font-weight: 800;
+      color: white;
+    }
+
+    .summary-stat .ss-label {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+    }
+
+    .btn-new-day {
+      background: linear-gradient(135deg, #16a34a, #4ade80);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 18px 40px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Rubik', sans-serif;
+      box-shadow: 0 8px 32px rgba(22,163,74,0.4);
+      transition: all 0.18s;
+    }
+    .btn-new-day:active { transform: scale(0.97); }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: var(--text);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      z-index: 500;
+      opacity: 0;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-basket {
+      text-align: center;
+      padding: 8px 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="app-header">
+  <h1>יואל — מעקב קלוריות 💪</h1>
+  <div class="date-line" id="dateDisplay"></div>
+</header>
+
+<!-- Motivation -->
+<div class="motivation">יואל אתה אלוף 💪 אני סומך עליך היום!</div>
+
+<!-- Progress Bars -->
+<div class="progress-section">
+  <div class="progress-row">
+    <div class="progress-item cal-bar">
+      <div class="progress-label">
+        <span class="prog-name">🔥 קלוריות</span>
+        <span class="prog-val" id="calLabel">0 / 1700</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="calBar" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="progress-item protein-bar">
+      <div class="progress-label">
+        <span class="prog-name">💪 חלבון</span>
+        <span class="prog-val" id="protLabel">0 / 150g</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="protBar" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Food Grid -->
+<div class="section-title">בחר מה אכלת</div>
+<div class="food-grid" id="foodGrid"></div>
+
+<!-- Floating Basket -->
+<div class="basket">
+  <div class="basket-summary">
+    <div class="basket-stat cal-stat">
+      <div class="bs-label">קלוריות</div>
+      <div class="bs-val" id="totalCal">0</div>
+      <div class="bs-remaining" id="remCal">נותר: 1700</div>
+    </div>
+    <div class="basket-stat prot-stat">
+      <div class="bs-label">חלבון</div>
+      <div class="bs-val" id="totalProt">0g</div>
+      <div class="bs-remaining" id="remProt">נותר: 150g</div>
+    </div>
+  </div>
+  <div class="basket-actions">
+    <button class="btn-undo" onclick="undoLast()">↩ ביטול</button>
+    <button class="btn-history" onclick="openLog()">📋 רשימה</button>
+    <button class="btn-done" onclick="openSummary()">סיימתי להיום ✓</button>
+  </div>
+</div>
+
+<!-- Quantity Modal -->
+<div class="modal-overlay" id="qtyModal" onclick="closeModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-emoji" id="modalEmoji"></div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-subtitle" id="modalSubtitle"></div>
+    <div id="modalBody"></div>
+    <button class="modal-confirm" onclick="confirmAdd()">הוסף ✓</button>
+    <button class="modal-cancel" onclick="closeModalDirect()">ביטול</button>
+  </div>
+</div>
+
+<!-- Log Panel -->
+<div class="log-panel" id="logPanel" onclick="closeLog(event)">
+  <div class="log-sheet" id="logSheet">
+    <div class="modal-handle" style="margin-bottom:12px;"></div>
+    <h3>מה אכלת היום</h3>
+    <div id="logList"></div>
+    <button class="log-close" onclick="closeLogDirect()">סגור</button>
+  </div>
+</div>
+
+<!-- Summary Overlay -->
+<div class="summary-overlay" id="summaryOverlay">
+  <div class="summary-emoji" id="summaryEmoji"></div>
+  <div class="summary-title" id="summaryTitle"></div>
+  <div class="summary-msg" id="summaryMsg"></div>
+  <div class="summary-stats">
+    <div class="summary-stat">
+      <div class="ss-val" id="summaryCalVal">0</div>
+      <div class="ss-label">קלוריות</div>
+    </div>
+    <div class="summary-stat">
+      <div class="ss-val" id="summaryProtVal">0g</div>
+      <div class="ss-label">חלבון</div>
+    </div>
+  </div>
+  <button class="btn-new-day" onclick="closeSummary()">יום חדש 🌅</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── FOOD DATA ──
+const FOODS = [
+  { id: 'tuna',      name: 'טונה',           emoji: '🐟', cal: 180,  prot: 25, type: 'simple' },
+  { id: 'mayo',      name: 'כף מיונז',       emoji: '🥄', cal: 35,   prot: 0,  type: 'simple' },
+  { id: 'pickles',   name: 'חמוצים',         emoji: '🥒', cal: 10,   prot: 0,  type: 'simple' },
+  { id: 'cracker',   name: 'קרקר פיטנס',    emoji: '🍪', cal: 20,   prot: 1,  type: 'cracker' },
+  { id: 'pita',      name: 'פיתה כוסמין',   emoji: '🫓', cal: 120,  prot: 4,  type: 'simple' },
+  { id: 'pita_pro',  name: 'פיתה חלבון',    emoji: '💪', cal: 160,  prot: 15, type: 'simple' },
+  { id: 'chicken',   name: 'חזה עוף',        emoji: '🍗', cal: 165,  prot: 31, type: 'weight', calPer100: 165, protPer100: 31 },
+  { id: 'thigh',     name: 'פרגית',          emoji: '🍖', cal: 220,  prot: 25, type: 'weight', calPer100: 220, protPer100: 25 },
+  { id: 'beef',      name: 'בשר בקר',        emoji: '🥩', cal: 250,  prot: 26, type: 'weight', calPer100: 250, protPer100: 26 },
+  { id: 'tortilla',  name: 'טורטיה',         emoji: '🌯', cal: 150,  prot: 5,  type: 'simple' },
+  { id: 'egg',       name: 'ביצה',           emoji: '🥚', cal: 70,   prot: 6,  type: 'eggs' },
+  { id: 'cheese',    name: 'גבינה 9%',       emoji: '🧀', cal: 60,   prot: 5,  type: 'simple' },
+  { id: 'symphony',  name: 'גבינת סימפוניה', emoji: '🫙', cal: 25,   prot: 1,  type: 'simple' },
+  { id: 'ketchup',   name: 'קטשופ',          emoji: '🍅', cal: 15,   prot: 0,  type: 'simple' },
+];
+
+const CAL_GOAL = 1700;
+const PROT_GOAL = 150;
+
+// ── STATE ──
+let log = [];      // { foodId, name, emoji, cal, prot, qty, label }
+let history = [];  // for undo
+
+let pendingFood = null;
+let pendingQty  = null;
+let crackerCount = 1;
+
+// ── STORAGE ──
+const TODAY = new Date().toISOString().slice(0, 10);
+
+function saveState() {
+  localStorage.setItem('cal_log_' + TODAY, JSON.stringify(log));
+}
+
+function loadState() {
+  // Clear old days
+  Object.keys(localStorage).forEach(k => {
+    if (k.startsWith('cal_log_') && !k.endsWith(TODAY)) {
+      localStorage.removeItem(k);
+    }
+  });
+  const saved = localStorage.getItem('cal_log_' + TODAY);
+  if (saved) log = JSON.parse(saved);
+}
+
+// ── TOTALS ──
+function getTotals() {
+  return log.reduce((acc, item) => {
+    acc.cal  += item.cal;
+    acc.prot += item.prot;
+    return acc;
+  }, { cal: 0, prot: 0 });
+}
+
+// ── UI UPDATE ──
+function updateUI() {
+  const { cal, prot } = getTotals();
+
+  // Progress bars
+  const calPct  = Math.min((cal / CAL_GOAL) * 100, 100);
+  const protPct = Math.min((prot / PROT_GOAL) * 100, 100);
+
+  document.getElementById('calLabel').textContent  = `${cal} / ${CAL_GOAL}`;
+  document.getElementById('protLabel').textContent = `${prot}g / ${PROT_GOAL}g`;
+
+  const calBarEl  = document.getElementById('calBar');
+  const protBarEl = document.getElementById('protBar');
+
+  calBarEl.style.width  = calPct  + '%';
+  protBarEl.style.width = protPct + '%';
+
+  calBarEl.className  = 'progress-bar-fill' + (cal > CAL_GOAL ? ' danger' : cal > 1500 ? ' warning' : '');
+  protBarEl.className = 'progress-bar-fill';
+
+  // Basket
+  document.getElementById('totalCal').textContent  = cal;
+  document.getElementById('totalProt').textContent = prot + 'g';
+  document.getElementById('remCal').textContent    = `נותר: ${Math.max(0, CAL_GOAL - cal)} קל`;
+  document.getElementById('remProt').textContent   = `נותר: ${Math.max(0, PROT_GOAL - prot)}g חלבון`;
+
+  saveState();
+}
+
+// ── RENDER FOOD GRID ──
+function renderGrid() {
+  const grid = document.getElementById('foodGrid');
+  grid.innerHTML = '';
+  FOODS.forEach(food => {
+    const div = document.createElement('div');
+    div.className = 'food-card';
+    div.id = 'fc_' + food.id;
+    div.innerHTML = `
+      <div class="food-emoji">${food.emoji}</div>
+      <div class="food-name">${food.name}</div>
+      <div class="food-meta">
+        <span class="cal">${food.cal} קל</span><br>
+        <span class="prot">${food.prot}g חלבון</span>
+      </div>
+    `;
+    div.addEventListener('click', (e) => {
+      addRipple(div, e);
+      handleFoodClick(food);
+    });
+    grid.appendChild(div);
+  });
+}
+
+function addRipple(el, e) {
+  const r = document.createElement('span');
+  r.className = 'ripple';
+  const rect = el.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.style.cssText = `width:${size}px;height:${size}px;top:${e.clientY-rect.top-size/2}px;left:${e.clientX-rect.left-size/2}px`;
+  el.appendChild(r);
+  setTimeout(() => r.remove(), 500);
+}
+
+// ── FOOD CLICK ──
+function handleFoodClick(food) {
+  if (food.type === 'simple') {
+    addItem(food, food.cal, food.prot, 1, '1 יחידה');
+    flashCard(food.id);
+  } else {
+    openModal(food);
+  }
+}
+
+function flashCard(id) {
+  const card = document.getElementById('fc_' + id);
+  if (!card) return;
+  card.classList.add('added');
+  setTimeout(() => card.classList.remove('added'), 600);
+}
+
+// ── ADD ITEM ──
+function addItem(food, cal, prot, qty, label) {
+  const entry = { foodId: food.id, name: food.name, emoji: food.emoji, cal, prot, qty, label };
+  history.push(JSON.parse(JSON.stringify(log)));
+  log.push(entry);
+  updateUI();
+  showToast(`${food.emoji} ${food.name} נוסף!`);
+}
+
+// ── MODAL ──
+function openModal(food) {
+  pendingFood = food;
+  pendingQty  = null;
+  crackerCount = 1;
+
+  document.getElementById('modalEmoji').textContent = food.emoji;
+  document.getElementById('modalTitle').textContent = food.name;
+
+  const body = document.getElementById('modalBody');
+
+  if (food.type === 'eggs') {
+    document.getElementById('modalSubtitle').textContent = 'כמה ביצים?';
+    body.innerHTML = `
+      <div class="qty-options">
+        <div class="qty-btn" onclick="selectQty(1, ${food.cal}, ${food.prot}, '1 ביצה')">
+          <div class="qty-label">1 ביצה</div>
+          <div class="qty-cal">${food.cal} קל</div>
+          <div class="qty-prot">${food.prot}g חלבון</div>
+        </div>
+        <div class="qty-btn" onclick="selectQty(2, ${food.cal*2}, ${food.prot*2}, '2 ביצים')">
+          <div class="qty-label">2 ביצים</div>
+          <div class="qty-cal">${food.cal*2} קל</div>
+          <div class="qty-prot">${food.prot*2}g חלבון</div>
+        </div>
+      </div>`;
+  } else if (food.type === 'weight') {
+    document.getElementById('modalSubtitle').textContent = 'כמה גרם?';
+    const opts = [100, 150, 200];
+    body.innerHTML = `<div class="qty-options">${opts.map(g => `
+      <div class="qty-btn" onclick="selectQty(${g}, ${Math.round(food.calPer100*g/100)}, ${Math.round(food.protPer100*g/100)}, '${g}g')">
+        <div class="qty-label">${g}g</div>
+        <div class="qty-cal">${Math.round(food.calPer100*g/100)} קל</div>
+        <div class="qty-prot">${Math.round(food.protPer100*g/100)}g חלבון</div>
+      </div>`).join('')}</div>`;
+  } else if (food.type === 'cracker') {
+    document.getElementById('modalSubtitle').textContent = 'כמה קרקרים?';
+    body.innerHTML = `
+      <div class="cracker-qty">
+        <button onclick="changeCracker(-1)">−</button>
+        <div class="cracker-num" id="crackerNum">1</div>
+        <button onclick="changeCracker(1)">+</button>
+      </div>
+      <div style="text-align:center;font-size:0.82rem;color:var(--text-muted);margin-bottom:16px;">
+        <span id="crackerCal">${food.cal}</span> קל • <span id="crackerProt">${food.prot}</span>g חלבון
+      </div>`;
+  }
+
+  document.getElementById('qtyModal').classList.add('open');
+}
+
+function selectQty(qty, cal, prot, label) {
+  document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  pendingQty = { qty, cal, prot, label };
+}
+
+function changeCracker(delta) {
+  crackerCount = Math.max(1, crackerCount + delta);
+  document.getElementById('crackerNum').textContent = crackerCount;
+  document.getElementById('crackerCal').textContent  = pendingFood.cal * crackerCount;
+  document.getElementById('crackerProt').textContent = pendingFood.prot * crackerCount;
+}
+
+function confirmAdd() {
+  if (!pendingFood) return;
+
+  if (pendingFood.type === 'cracker') {
+    addItem(pendingFood, pendingFood.cal * crackerCount, pendingFood.prot * crackerCount, crackerCount, `${crackerCount} יחידות`);
+    flashCard(pendingFood.id);
+    closeModalDirect();
+    return;
+  }
+
+  if (!pendingQty) {
+    showToast('בחר כמות קודם 😊');
+    return;
+  }
+  addItem(pendingFood, pendingQty.cal, pendingQty.prot, pendingQty.qty, pendingQty.label);
+  flashCard(pendingFood.id);
+  closeModalDirect();
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('qtyModal')) closeModalDirect();
+}
+
+function closeModalDirect() {
+  document.getElementById('qtyModal').classList.remove('open');
+  pendingFood = null;
+  pendingQty  = null;
+}
+
+// ── LOG ──
+function openLog() {
+  const listEl = document.getElementById('logList');
+  if (log.length === 0) {
+    listEl.innerHTML = '<div class="empty-basket">עדיין לא הוספת כלום היום 😊</div>';
+  } else {
+    listEl.innerHTML = log.map((item, i) => `
+      <div class="log-item" id="li_${i}">
+        <div class="log-emoji">${item.emoji}</div>
+        <div class="log-info">
+          <div class="log-name">${item.name}</div>
+          <div class="log-meta">${item.label} · ${item.cal} קל · ${item.prot}g חלבון</div>
+        </div>
+        <button class="log-remove" onclick="removeItem(${i})"><i class="fa fa-trash"></i></button>
+      </div>`).join('');
+  }
+  document.getElementById('logPanel').classList.add('open');
+}
+
+function closeLog(e) {
+  if (e.target === document.getElementById('logPanel')) closeLogDirect();
+}
+
+function closeLogDirect() {
+  document.getElementById('logPanel').classList.remove('open');
+}
+
+function removeItem(i) {
+  history.push(JSON.parse(JSON.stringify(log)));
+  log.splice(i, 1);
+  updateUI();
+  openLog();
+}
+
+// ── UNDO ──
+function undoLast() {
+  if (history.length === 0) { showToast('אין מה לבטל'); return; }
+  log = history.pop();
+  updateUI();
+  showToast('↩ הפעולה בוטלה');
+}
+
+// ── SUMMARY ──
+function openSummary() {
+  const { cal, prot } = getTotals();
+  document.getElementById('summaryCalVal').textContent  = cal;
+  document.getElementById('summaryProtVal').textContent = prot + 'g';
+
+  let emoji, title, msg;
+
+  if (cal >= 1500 && cal <= 1700) {
+    emoji = '🎯';
+    title = 'אלוף! עמדת ביעד!';
+    msg   = 'עשית עבודה מדהימה היום יואל.\nהגוף שלך מודה לך 💪';
+  } else if (cal > 1700) {
+    emoji = '💪';
+    title = 'מחר יום חדש!';
+    msg   = 'קצת עברת את היעד, אבל זה בסדר.\nמחר מתחילים מחדש עם כוחות חדשים!';
+  } else {
+    emoji = '⚡';
+    title = 'קרוב לביעד!';
+    msg   = 'לא הגעת ל-1500 קלוריות.\nוודא שאתה אוכל מספיק לתמיכת האימונים!';
+  }
+
+  if (prot < 120) {
+    msg += '\n\n💡 תנסה להוסיף יותר חלבון מחר';
+  }
+
+  document.getElementById('summaryEmoji').textContent = emoji;
+  document.getElementById('summaryTitle').textContent = title;
+  document.getElementById('summaryMsg').textContent   = msg;
+
+  document.getElementById('summaryOverlay').classList.add('open');
+}
+
+function closeSummary() {
+  document.getElementById('summaryOverlay').classList.remove('open');
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ── DATE ──
+function setDate() {
+  const d = new Date();
+  const opts = { weekday: 'long', day: 'numeric', month: 'long', calendar: 'hebrew' };
+  try {
+    const heb = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', opts).format(d);
+    document.getElementById('dateDisplay').textContent = heb;
+  } catch {
+    document.getElementById('dateDisplay').textContent = d.toLocaleDateString('he-IL');
+  }
+}
+
+// ── INIT ──
+loadState();
+renderGrid();
+updateUI();
+setDate();
+</script>
+</body>
+</html>
