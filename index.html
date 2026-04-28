@@ -603,6 +603,25 @@
       border-radius: 6px;
       line-height: 1;
     }
+    .custom-food-delete {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 20px;
+      height: 20px;
+      background: #fee2e2;
+      border: none;
+      border-radius: 6px;
+      color: var(--danger);
+      font-size: 0.65rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      z-index: 2;
+    }
+    .custom-food-delete:hover { background: #fecaca; }
   </style>
 </head>
 <body>
@@ -855,6 +874,16 @@ function saveCustomFoods() {
   localStorage.setItem('custom_foods', JSON.stringify(customFoods));
 }
 
+function deleteCustomFood(id) {
+  const food = customFoods.find(f => f.id === id);
+  if (!food) return;
+  if (!confirm(`למחוק את "${food.name}" מהמוצרים הקבועים?`)) return;
+  customFoods = customFoods.filter(f => f.id !== id);
+  saveCustomFoods();
+  renderGrid();
+  showToast(`🗑️ ${food.name} נמחק`);
+}
+
 // ── TOTALS ──
 function getTotals() {
   return log.reduce((acc, item) => ({ cal: acc.cal + item.cal, prot: acc.prot + item.prot }), { cal: 0, prot: 0 });
@@ -894,12 +923,19 @@ function makeFoodCard(food) {
   const displayProt = food.type === 'weight' ? `${food.protPer100}g/100g`  : `${food.prot}g חלבון`;
   div.innerHTML = `
     ${food.isCustom ? '<div class="custom-food-badge">שלי</div>' : ''}
+    ${food.isCustom ? `<button class="custom-food-delete" title="מחק מוצר"><i class="fa fa-times"></i></button>` : ''}
     <div class="food-emoji">${food.emoji}</div>
     <div class="food-name">${food.name}</div>
     <div class="food-meta">
       <span class="cal">${displayCal}</span><br>
       <span class="prot">${displayProt}</span>
     </div>`;
+  if (food.isCustom) {
+    div.querySelector('.custom-food-delete').addEventListener('click', e => {
+      e.stopPropagation();
+      deleteCustomFood(food.id);
+    });
+  }
   div.addEventListener('click', e => { addRipple(div, e); handleFoodClick(food); });
   return div;
 }
