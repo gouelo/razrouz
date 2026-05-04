@@ -1,6 +1,6 @@
 // Yoel's Stock Portfolio Widget
-// Scriptable iOS Widget
-// Version: 1.0
+// Scriptable iOS Widget — v2.0
+// Uses Yahoo Finance v8/chart endpoint (v7/quote blocked on Scriptable)
 
 // ─── Portfolio Configuration ───────────────────────────────────────────────
 const PORTFOLIO = {
@@ -28,33 +28,19 @@ const PORTFOLIO = {
   UPST: 52,
 };
 
-const CACHE_KEY = "yoel_portfolio_cache";
-const CACHE_DURATION_MIN = 15; // minutes
+const CACHE_KEY      = "yoel_portfolio_v2_cache";
+const CACHE_DURATION = 10; // minutes
 
 // ─── Colors ────────────────────────────────────────────────────────────────
 const COLOR = {
-  bg:          new Color("#0d0d0d"),
-  bgCard:      new Color("#1a1a1a"),
-  title:       new Color("#ffffff"),
-  label:       new Color("#aaaaaa"),
-  value:       new Color("#ffffff"),
-  gain:        new Color("#00d26a"),
-  loss:        new Color("#ff4444"),
-  neutral:     new Color("#888888"),
-  ils:         new Color("#ffd700"),
-  accent:      new Color("#3d8bff"),
-};
-
-// ─── Fonts ──────────────────────────────────────────────────────────────────
-const FONT = {
-  title:       Font.boldSystemFont(13),
-  totalLabel:  Font.systemFont(10),
-  totalUSD:    Font.boldSystemFont(26),
-  totalILS:    Font.boldSystemFont(14),
-  stockName:   Font.boldSystemFont(10),
-  stockVal:    Font.systemFont(9),
-  pct:         Font.boldSystemFont(10),
-  timestamp:   Font.systemFont(8),
+  bg:      new Color("#111111"),
+  title:   new Color("#ffffff"),
+  hero:    new Color("#ffffff"),
+  usd:     new Color("#888888"),
+  gain:    new Color("#00e676"),
+  loss:    new Color("#ff4444"),
+  neutral: new Color("#888888"),
+  footer:  new Color("#555555"),
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -65,16 +51,16 @@ function fmt(n, decimals = 2) {
   });
 }
 
-function fmtCurrency(n, symbol = "$") {
-  if (n >= 1_000_000) return `${symbol}${fmt(n / 1_000_000, 2)}M`;
-  if (n >= 1_000)     return `${symbol}${fmt(n / 1_000, 2)}K`;
-  return `${symbol}${fmt(n, 2)}`;
+function fmtILS(n) {
+  if (n >= 1_000_000) return `₪${fmt(n / 1_000_000, 2)}M`;
+  if (n >= 1_000)     return `₪${fmt(n / 1_000, 1)}K`;
+  return `₪${fmt(n, 0)}`;
 }
 
-function pctColor(pct) {
-  if (pct > 0)  return COLOR.gain;
-  if (pct < 0)  return COLOR.loss;
-  return COLOR.neutral;
+function fmtUSD(n) {
+  if (n >= 1_000_000) return `$${fmt(n / 1_000_000, 2)}M`;
+  if (n >= 1_000)     return `$${fmt(n / 1_000, 1)}K`;
+  return `$${fmt(n, 0)}`;
 }
 
 function pctStr(pct) {
@@ -82,33 +68,30 @@ function pctStr(pct) {
   return `${sign}${fmt(pct, 2)}%`;
 }
 
+function pctColor(pct) {
+  if (pct > 0) return COLOR.gain;
+  if (pct < 0) return COLOR.loss;
+  return COLOR.neutral;
+}
+
 // ─── Cache ──────────────────────────────────────────────────────────────────
-function loadCache() {
+function cacheGet() {
   try {
-    const fm = FileManager.local();
+    const fm   = FileManager.local();
     const path = fm.joinPath(fm.temporaryDirectory(), `${CACHE_KEY}.json`);
     if (!fm.fileExists(path)) return null;
-    const raw = fm.readString(path);
-    const obj = JSON.parse(raw);
-    const age = (Date.now() - obj.timestamp) / 60000;
-    if (age > CACHE_DURATION_MIN) return null;
+    const obj = JSON.parse(fm.readString(path));
+    const ageMin = (Date.now() - obj.timestamp) / 60000;
+    if (ageMin > CACHE_DURATION) return null;
     return obj;
   } catch (e) {
     return null;
   }
 }
 
-function saveCache(data) {
+function cacheGetStale() {
   try {
-    const fm = FileManager.local();
-    const path = fm.joinPath(fm.temporaryDirectory(), `${CACHE_KEY}.json`);
-    fm.writeString(path, JSON.stringify({ ...data, timestamp: Date.now() }));
-  } catch (e) {}
-}
-
-function loadStaleCache() {
-  try {
-    const fm = FileManager.local();
+    const fm   = FileManager.local();
     const path = fm.joinPath(fm.temporaryDirectory(), `${CACHE_KEY}.json`);
     if (!fm.fileExists(path)) return null;
     return JSON.parse(fm.readString(path));
@@ -117,308 +100,302 @@ function loadStaleCache() {
   }
 }
 
-// ─── Data Fetching ──────────────────────────────────────────────────────────
-async function fetchQuotes(tickers) {
-  const symbols = tickers.join(",");
-  const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(symbols)}&fields=regularMarketPrice,regularMarketChangePercent,regularMarketPreviousClose,shortName`;
+function cachePut(data) {
+  try {
+    const fm   = FileManager.local();
+    const path = fm.joinPath(fm.temporaryDirectory(), `${CACHE_KEY}.json`);
+    fm.writeString(path, JSON.stringify({ ...data, timestamp: Date.now() }));
+  } catch (e) {}
+}
 
+// ─── Fetch single ticker via v8/chart ───────────────────────────────────────
+async function fetchTicker(symbol) {
+  const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2d&includePrePost=false`;
   const req = new Request(url);
   req.headers = {
-    "User-Agent": "Mozilla/5.0",
+    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)",
     "Accept": "application/json",
   };
-  req.timeoutInterval = 10;
+  req.timeoutInterval = 12;
 
   const json = await req.loadJSON();
-  const results = json?.quoteResponse?.result ?? [];
+  const meta = json?.chart?.result?.[0]?.meta;
+  if (!meta) throw new Error(`No meta for ${symbol}`);
 
-  const map = {};
+  return {
+    symbol,
+    price: meta.regularMarketPrice  ?? 0,
+    prev:  meta.chartPreviousClose  ?? meta.previousClose ?? 0,
+  };
+}
+
+// ─── Fetch all tickers in parallel ──────────────────────────────────────────
+async function fetchAll() {
+  const tickers = Object.keys(PORTFOLIO);
+  // Include ILS=X for exchange rate
+  const allSymbols = [...tickers, "ILS=X"];
+
+  const results = await Promise.all(
+    allSymbols.map(sym =>
+      fetchTicker(sym).catch(e => ({ symbol: sym, price: 0, prev: 0, error: true }))
+    )
+  );
+
+  const quotes  = {};
+  let   ilsRate = null;
+
   for (const r of results) {
-    map[r.symbol] = {
-      price: r.regularMarketPrice ?? 0,
-      pct:   r.regularMarketChangePercent ?? 0,
-      prev:  r.regularMarketPreviousClose ?? 0,
-      name:  r.shortName ?? r.symbol,
-    };
-  }
-  return map;
-}
-
-async function fetchExchangeRate() {
-  // Try ILS=X first, fallback to USDILS=X
-  for (const ticker of ["ILS=X", "USDILS=X"]) {
-    try {
-      const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`;
-      const req = new Request(url);
-      req.headers = { "User-Agent": "Mozilla/5.0", "Accept": "application/json" };
-      req.timeoutInterval = 8;
-      const json = await req.loadJSON();
-      const results = json?.quoteResponse?.result ?? [];
-      if (results.length > 0 && results[0].regularMarketPrice) {
-        return results[0].regularMarketPrice;
+    if (r.symbol === "ILS=X") {
+      if (!r.error && r.price > 0) ilsRate = r.price;
+    } else {
+      if (!r.error) {
+        quotes[r.symbol] = { price: r.price, prev: r.prev };
       }
-    } catch (e) {}
+    }
   }
-  return null;
+
+  return { quotes, ilsRate };
 }
 
-// ─── Main Data Loader ───────────────────────────────────────────────────────
+// ─── Load Data (with cache) ──────────────────────────────────────────────────
 async function loadData() {
-  const cached = loadCache();
+  const cached = cacheGet();
   if (cached) return { ...cached, fromCache: true };
 
-  let quotes = {};
+  let quotes  = {};
   let ilsRate = null;
-  let fetchError = false;
-
-  const allTickers = Object.keys(PORTFOLIO);
+  let fetchOk = false;
 
   try {
-    quotes = await fetchQuotes(allTickers);
-  } catch (e) {
-    fetchError = true;
-  }
-
-  try {
-    ilsRate = await fetchExchangeRate();
+    const result = await fetchAll();
+    quotes  = result.quotes;
+    ilsRate = result.ilsRate;
+    fetchOk = Object.keys(quotes).length > 0;
   } catch (e) {}
 
-  if (fetchError && Object.keys(quotes).length === 0) {
-    const stale = loadStaleCache();
+  if (!fetchOk) {
+    const stale = cacheGetStale();
     if (stale) return { ...stale, fromCache: true, stale: true };
     return null;
   }
 
-  const data = { quotes, ilsRate, fetchError };
-  saveCache(data);
+  const data = { quotes, ilsRate };
+  cachePut(data);
   return { ...data, fromCache: false };
 }
 
 // ─── Compute Portfolio Stats ─────────────────────────────────────────────────
 function computeStats(quotes) {
-  let totalUSD = 0;
+  let totalUSD     = 0;
   let totalPrevUSD = 0;
-  const stocks = [];
+  const stocks     = [];
 
   for (const [ticker, qty] of Object.entries(PORTFOLIO)) {
     const q = quotes[ticker];
-    if (!q) continue;
+    if (!q || q.price === 0) continue;
 
-    const value    = q.price * qty;
-    const prevVal  = q.prev  * qty;
-    totalUSD      += value;
-    totalPrevUSD  += prevVal;
+    const value   = q.price * qty;
+    const prevVal = q.prev  * qty;
+    totalUSD     += value;
+    totalPrevUSD += prevVal;
 
-    stocks.push({ ticker, qty, price: q.price, pct: q.pct, value, prevVal, name: q.name });
+    const pct = q.prev > 0 ? ((q.price - q.prev) / q.prev) * 100 : 0;
+    stocks.push({ ticker, qty, price: q.price, pct, value, prevVal });
   }
 
   const dayChangePct = totalPrevUSD > 0
     ? ((totalUSD - totalPrevUSD) / totalPrevUSD) * 100
     : 0;
 
-  // Sort by absolute % change for top movers
-  const sorted = [...stocks].sort((a, b) => Math.abs(b.pct) - Math.abs(a.pct));
-  const topGainers = stocks.filter(s => s.pct > 0).sort((a, b) => b.pct - a.pct).slice(0, 3);
-  const topLosers  = stocks.filter(s => s.pct < 0).sort((a, b) => a.pct - b.pct).slice(0, 3);
+  const topGainers = stocks
+    .filter(s => s.pct > 0)
+    .sort((a, b) => b.pct - a.pct)
+    .slice(0, 3);
 
-  return { totalUSD, dayChangePct, topGainers, topLosers };
+  const topLosers = stocks
+    .filter(s => s.pct < 0)
+    .sort((a, b) => a.pct - b.pct)
+    .slice(0, 3);
+
+  return { totalUSD, dayChangePct, topGainers, topLosers, stockCount: stocks.length };
 }
 
 // ─── Widget Builder ──────────────────────────────────────────────────────────
-function buildWidget(data, isPreview = false) {
+function buildWidget(data) {
   const w = new ListWidget();
   w.backgroundColor = COLOR.bg;
   w.setPadding(12, 14, 10, 14);
   w.url = "stocks://";
 
+  // ── Error state ─────────────────────────────────────────────────────────
   if (!data) {
-    // Error state
-    const errStack = w.addStack();
-    errStack.layoutVertically();
-    errStack.centerAlignContent();
+    const col = w.addStack();
+    col.layoutVertically();
+    col.centerAlignContent();
 
-    const t1 = errStack.addText("תיק מניות 📊");
-    t1.textColor = COLOR.title;
-    t1.font = FONT.title;
+    const t = col.addText("תיק מניות 📊");
+    t.textColor = COLOR.title;
+    t.font = Font.boldSystemFont(12);
 
-    errStack.addSpacer(8);
+    col.addSpacer(8);
 
-    const t2 = errStack.addText("⚠️ שגיאה בטעינת נתונים");
-    t2.textColor = COLOR.loss;
-    t2.font = FONT.totalLabel;
+    const e = col.addText("⚠️ שגיאה בטעינת נתונים");
+    e.textColor = COLOR.loss;
+    e.font = Font.systemFont(11);
 
     return w;
   }
 
   const { quotes, ilsRate, fromCache, stale } = data;
-  const { totalUSD, dayChangePct, topGainers, topLosers } = computeStats(quotes);
-  const totalILS = ilsRate ? totalUSD * ilsRate : null;
+  const { totalUSD, dayChangePct, topGainers, topLosers, stockCount } = computeStats(quotes);
+  const totalILS = ilsRate && ilsRate > 0 ? totalUSD * ilsRate : null;
 
-  // ── Header row ─────────────────────────────────────────────────────────
-  const headerRow = w.addStack();
-  headerRow.layoutHorizontally();
-  headerRow.centerAlignContent();
+  // ── Header row: title left, date/time right ─────────────────────────────
+  const now     = new Date();
+  const timeStr = now.toLocaleTimeString("he-IL", {
+    hour: "2-digit", minute: "2-digit",
+    timeZone: "Asia/Jerusalem",
+  });
+  const dateStr = now.toLocaleDateString("he-IL", {
+    day: "2-digit", month: "2-digit",
+    timeZone: "Asia/Jerusalem",
+  });
 
-  const titleText = headerRow.addText("תיק מניות 📊");
-  titleText.textColor = COLOR.title;
-  titleText.font = FONT.title;
+  const header = w.addStack();
+  header.layoutHorizontally();
+  header.centerAlignContent();
 
-  headerRow.addSpacer();
+  const titleT = header.addText("תיק מניות 📊");
+  titleT.textColor = COLOR.title;
+  titleT.font = Font.systemFont(10);
 
-  // Day change badge
-  const badgeStack = headerRow.addStack();
-  badgeStack.layoutHorizontally();
-  badgeStack.cornerRadius = 6;
-  badgeStack.backgroundColor = dayChangePct >= 0
-    ? new Color("#00d26a22")
-    : new Color("#ff444422");
-  badgeStack.setPadding(2, 6, 2, 6);
+  header.addSpacer();
 
-  const badgeText = badgeStack.addText(pctStr(dayChangePct));
-  badgeText.textColor = pctColor(dayChangePct);
-  badgeText.font = Font.boldSystemFont(9);
+  const dateT = header.addText(`${dateStr}  ${timeStr}`);
+  dateT.textColor = COLOR.neutral;
+  dateT.font = Font.systemFont(9);
+
+  w.addSpacer(6);
+
+  // ── Hero: ILS amount ─────────────────────────────────────────────────────
+  const heroILS = totalILS !== null ? fmtILS(totalILS) : "₪---";
+  const heroText = w.addText(heroILS);
+  heroText.textColor = COLOR.hero;
+  heroText.font = Font.boldSystemFont(32);
+  heroText.minimumScaleFactor = 0.5;
+
+  w.addSpacer(2);
+
+  // ── USD amount (smaller, gray) ────────────────────────────────────────────
+  const usdText = w.addText(fmtUSD(totalUSD));
+  usdText.textColor = COLOR.usd;
+  usdText.font = Font.systemFont(13);
+  usdText.minimumScaleFactor = 0.7;
 
   w.addSpacer(4);
 
-  // ── Total USD ───────────────────────────────────────────────────────────
-  const usdLabel = w.addText("שווי כולל");
-  usdLabel.textColor = COLOR.label;
-  usdLabel.font = FONT.totalLabel;
+  // ── Day change badge ─────────────────────────────────────────────────────
+  const arrow     = dayChangePct >= 0 ? "↑" : "↓";
+  const badgeStr  = `${pctStr(dayChangePct)} היום ${arrow}`;
+  const badgeCol  = pctColor(dayChangePct);
 
-  const usdText = w.addText(`$${fmt(totalUSD, 2)}`);
-  usdText.textColor = COLOR.value;
-  usdText.font = FONT.totalUSD;
-  usdText.minimumScaleFactor = 0.6;
+  const badgeRow = w.addStack();
+  badgeRow.layoutHorizontally();
 
-  // ── Total ILS ───────────────────────────────────────────────────────────
-  if (totalILS !== null) {
-    const ilsRow = w.addStack();
-    ilsRow.layoutHorizontally();
-    ilsRow.centerAlignContent();
+  const badge = badgeRow.addStack();
+  badge.layoutHorizontally();
+  badge.cornerRadius = 8;
+  badge.backgroundColor = dayChangePct >= 0
+    ? new Color("#00e67620")
+    : new Color("#ff444420");
+  badge.setPadding(3, 8, 3, 8);
+  badge.centerAlignContent();
 
-    const shekelText = ilsRow.addText(`₪${fmt(totalILS, 0)}`);
-    shekelText.textColor = COLOR.ils;
-    shekelText.font = FONT.totalILS;
+  const badgeText = badge.addText(badgeStr);
+  badgeText.textColor = badgeCol;
+  badgeText.font = Font.boldSystemFont(18);
+  badgeText.minimumScaleFactor = 0.5;
 
-    ilsRow.addSpacer(4);
-
-    const rateLabel = ilsRow.addText(`(1$ = ₪${fmt(ilsRate, 3)})`);
-    rateLabel.textColor = COLOR.neutral;
-    rateLabel.font = Font.systemFont(8);
-  }
+  badgeRow.addSpacer();
 
   w.addSpacer(6);
 
-  // ── Divider ─────────────────────────────────────────────────────────────
-  const divider = w.addStack();
-  divider.backgroundColor = new Color("#333333");
-  divider.size = new Size(0, 1);
-
-  w.addSpacer(6);
-
-  // ── Top Movers ──────────────────────────────────────────────────────────
+  // ── Top movers row ───────────────────────────────────────────────────────
   const moversRow = w.addStack();
   moversRow.layoutHorizontally();
 
-  // Gainers column
-  const gainersCol = moversRow.addStack();
-  gainersCol.layoutVertically();
-
-  const gainHeader = gainersCol.addText("↑ עולים");
-  gainHeader.textColor = COLOR.gain;
-  gainHeader.font = Font.boldSystemFont(9);
-  gainersCol.addSpacer(2);
+  // Gainers (left)
+  const gainCol = moversRow.addStack();
+  gainCol.layoutVertically();
 
   for (const s of topGainers) {
-    const row = gainersCol.addStack();
+    const row  = gainCol.addStack();
     row.layoutHorizontally();
+    row.spacing = 4;
 
-    const nameT = row.addText(s.ticker);
-    nameT.textColor = COLOR.value;
-    nameT.font = FONT.stockName;
+    const nt = row.addText(s.ticker);
+    nt.textColor = COLOR.hero;
+    nt.font = Font.boldSystemFont(9);
 
-    row.addSpacer(3);
+    const pt = row.addText(pctStr(s.pct));
+    pt.textColor = COLOR.gain;
+    pt.font = Font.systemFont(9);
 
-    const pctT = row.addText(pctStr(s.pct));
-    pctT.textColor = COLOR.gain;
-    pctT.font = FONT.pct;
-
-    gainersCol.addSpacer(1);
+    gainCol.addSpacer(2);
   }
 
   moversRow.addSpacer();
 
-  // Losers column
-  const losersCol = moversRow.addStack();
-  losersCol.layoutVertically();
-
-  const lossHeader = losersCol.addText("↓ יורדים");
-  lossHeader.textColor = COLOR.loss;
-  lossHeader.font = Font.boldSystemFont(9);
-  losersCol.addSpacer(2);
+  // Losers (right)
+  const lossCol = moversRow.addStack();
+  lossCol.layoutVertically();
 
   for (const s of topLosers) {
-    const row = losersCol.addStack();
+    const row = lossCol.addStack();
     row.layoutHorizontally();
+    row.spacing = 4;
 
-    const nameT = row.addText(s.ticker);
-    nameT.textColor = COLOR.value;
-    nameT.font = FONT.stockName;
+    const nt = row.addText(s.ticker);
+    nt.textColor = COLOR.hero;
+    nt.font = Font.boldSystemFont(9);
 
-    row.addSpacer(3);
+    const pt = row.addText(pctStr(s.pct));
+    pt.textColor = COLOR.loss;
+    pt.font = Font.systemFont(9);
 
-    const pctT = row.addText(pctStr(s.pct));
-    pctT.textColor = COLOR.loss;
-    pctT.font = FONT.pct;
-
-    losersCol.addSpacer(1);
+    lossCol.addSpacer(2);
   }
 
   w.addSpacer();
 
-  // ── Footer: timestamp + cache indicator ─────────────────────────────────
-  const footerRow = w.addStack();
-  footerRow.layoutHorizontally();
+  // ── Footer: "עודכן HH:MM" ────────────────────────────────────────────────
+  const footer = w.addStack();
+  footer.layoutHorizontally();
 
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString("he-IL", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Asia/Jerusalem",
-  });
-  const dateStr = now.toLocaleDateString("he-IL", {
-    day: "2-digit",
-    month: "2-digit",
-    timeZone: "Asia/Jerusalem",
-  });
+  let footerStr = `עודכן ${timeStr}`;
+  if (stale) footerStr += " ⚠️";
 
-  let statusIcon = "";
-  if (stale)      statusIcon = " ⚠️";
-  else if (fromCache) statusIcon = " 🔄";
+  const footerText = footer.addText(footerStr);
+  footerText.textColor = COLOR.footer;
+  footerText.font = Font.systemFont(8);
 
-  const tsText = footerRow.addText(`עודכן: ${dateStr} ${timeStr}${statusIcon}`);
-  tsText.textColor = COLOR.neutral;
-  tsText.font = FONT.timestamp;
+  footer.addSpacer();
 
-  footerRow.addSpacer();
-
-  const stockCount = Object.keys(quotes).length;
-  const countText = footerRow.addText(`${stockCount}/${Object.keys(PORTFOLIO).length} מניות`);
-  countText.textColor = COLOR.neutral;
-  countText.font = FONT.timestamp;
+  const countText = footer.addText(`${stockCount}/${Object.keys(PORTFOLIO).length}`);
+  countText.textColor = COLOR.footer;
+  countText.font = Font.systemFont(8);
 
   return w;
 }
 
 // ─── Entry Point ─────────────────────────────────────────────────────────────
 async function run() {
-  const data = await loadData();
+  const data   = await loadData();
   const widget = buildWidget(data);
 
   if (config.runsInWidget) {
     Script.setWidget(widget);
   } else {
-    // Preview in app
     widget.presentMedium();
   }
 
